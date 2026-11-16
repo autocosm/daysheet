@@ -1,6 +1,6 @@
 # daysheet
 
-https://autocosm.github.io/daysheet/daysheet-prototype.html
+[https://autocosm.github.io/daysheet/daysheet-prototype.html](https://autocosm.github.io/daysheet/daysheet-prototype.html)
 
 ## Tester instructions
 
@@ -14,7 +14,7 @@ What you're testing is a clickable prototype, not a finished app. The data is ma
 
 ## Before you start
 
-1. Open the prototype in a browser on a phone or computer: https://autocosm.github.io/daysheet/daysheet-prototype.html
+1. Open the prototype in a browser on a phone or computer: [https://autocosm.github.io/daysheet/daysheet-prototype.html](https://autocosm.github.io/daysheet/daysheet-prototype.html)
 2. Next to the phone-sized screen there is a small control panel. You can use it to switch who you're viewing as and to reset the sample data. If you get lost, use "Reset sample data" and start the task over.
 3. Nothing you do is sent to me. Your changes stay in your own browser, so please send me your answers using the form below.
 4. Please think out loud, or jot notes as you go. Say what you expect to happen before you tap, and what you thought when it did or didn't.
