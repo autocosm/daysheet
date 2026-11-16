@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DaySheet Prototype</title>
+<!-- Avenir Next is used where the device has it. Elsewhere Nunito Sans loads from Google Fonts; offline, system fonts take over. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+/* DaySheet design system.
+   Brand: the secondary colors of light (cyan, magenta, yellow) over deep neutrals, like gels on a dark stage.
+   Depth: two elevations plus a soft top highlight on every raised surface.
+   Gradient is kept for brand moments (primary action, progress, the Next up card) and never carries status alone.
+   Layout: a control rig on the left drives a phone-framed app; under 860px the app goes full-bleed and the rig becomes a drawer. */
+:root{
+  --stage:#e7eaf2; --bg:#f4f5f9; --surface:#ffffff; --raised:#edeff5; --ink:#101420; --muted:#56607a; --line:#dde1ea;
+  --cyan:#00728c; --cyan-bg:#d8f4fb; --mag:#b5127b; --mag-bg:#fde3f3; --yel:#6b4f00; --yel-bg:#ffefb3; --ok:#0c6b3b; --ok-bg:#d8f3e3; --bad:#a8201a; --bad-bg:#fde4e1;
+  --c-cyan:#19c8e6; --c-mag:#ec2c9a; --c-yel:#f7c81a;
+  --primary-a:#d91c87; --primary-b:#b5107a; --on-primary:#ffffff; --primary-glow:rgba(217,28,135,.30);
+  --glyph-ink:#ffffff;
+  --card:linear-gradient(180deg,#ffffff,#fafbfd); --card-line:rgba(16,24,40,.09); --field:#ffffff;
+  --e1:0 1px 2px rgba(16,24,40,.06),0 3px 10px rgba(16,24,40,.05);
+  --e2:0 2px 6px rgba(16,24,40,.08),0 14px 30px rgba(16,24,40,.13);
+  --hi:inset 0 1px 0 rgba(255,255,255,.9);
+  --app-bg:radial-gradient(120% 42% at 0% 0%,rgba(25,200,230,.10),transparent 62%),radial-gradient(120% 42% at 100% 0%,rgba(236,44,154,.08),transparent 62%),linear-gradient(180deg,#f8f9fc,#eef0f6);
+  --glow-c:rgba(0,190,230,.20); --glow-m:rgba(230,40,160,.14); --glow-y:rgba(245,200,0,.20);
+  --shadow:0 30px 70px rgba(20,28,45,.26),0 4px 14px rgba(20,28,45,.10);
+  --font:"Avenir Next","Avenir","Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:16px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --stage:#05060a; --bg:#0a0c12; --surface:#161a25; --raised:#212738; --ink:#f5f6fa; --muted:#a7b0c4; --line:#2b3246;
+    --cyan:#5ee0f7; --cyan-bg:#0c3642; --mag:#ff7fd0; --mag-bg:#451236; --yel:#ffd95a; --yel-bg:#3d3207; --ok:#6ae39d; --ok-bg:#0e3622; --bad:#ff9288; --bad-bg:#431512;
+    --primary-a:#e3229a; --primary-b:#b8107c; --on-primary:#ffffff; --primary-glow:rgba(255,50,170,.45);
+    --glyph-ink:#0a0c12;
+    --card:linear-gradient(180deg,#1c2131,#151925); --card-line:rgba(255,255,255,.08); --field:#10141d;
+    --e1:0 1px 0 rgba(0,0,0,.35),0 8px 20px rgba(0,0,0,.34);
+    --e2:0 2px 4px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.55);
+    --hi:inset 0 1px 0 rgba(255,255,255,.07);
+    --app-bg:radial-gradient(120% 40% at 0% 0%,rgba(25,200,230,.17),transparent 62%),radial-gradient(120% 40% at 100% 0%,rgba(236,44,154,.17),transparent 62%),linear-gradient(180deg,#0c0f17,#0a0c12);
+    --glow-c:rgba(0,200,240,.20); --glow-m:rgba(255,40,180,.16); --glow-y:rgba(255,210,0,.12);
+    --shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --stage:#05060a; --bg:#0a0c12; --surface:#161a25; --raised:#212738; --ink:#f5f6fa; --muted:#a7b0c4; --line:#2b3246;
+  --cyan:#5ee0f7; --cyan-bg:#0c3642; --mag:#ff7fd0; --mag-bg:#451236; --yel:#ffd95a; --yel-bg:#3d3207; --ok:#6ae39d; --ok-bg:#0e3622; --bad:#ff9288; --bad-bg:#431512;
+  --primary-a:#e3229a; --primary-b:#b8107c; --on-primary:#ffffff; --primary-glow:rgba(255,50,170,.45);
+  --glyph-ink:#0a0c12;
+  --card:linear-gradient(180deg,#1c2131,#151925); --card-line:rgba(255,255,255,.08); --field:#10141d;
+  --e1:0 1px 0 rgba(0,0,0,.35),0 8px 20px rgba(0,0,0,.34);
+  --e2:0 2px 4px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.55);
+  --hi:inset 0 1px 0 rgba(255,255,255,.07);
+  --app-bg:radial-gradient(120% 40% at 0% 0%,rgba(25,200,230,.17),transparent 62%),radial-gradient(120% 40% at 100% 0%,rgba(236,44,154,.17),transparent 62%),linear-gradient(180deg,#0c0f17,#0a0c12);
+  --glow-c:rgba(0,200,240,.20); --glow-m:rgba(255,40,180,.16); --glow-y:rgba(255,210,0,.12);
+  --shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:16px/1.45 var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(55vmax 55vmax at 0% 0%,var(--glow-c),transparent 62%),
+    radial-gradient(50vmax 50vmax at 100% 8%,var(--glow-m),transparent 62%),
+    radial-gradient(55vmax 45vmax at 55% 115%,var(--glow-y),transparent 62%),
+    var(--stage);
+  background-attachment:fixed}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+button:focus-visible,input:focus-visible,select:focus-visible,label.sbtn:focus-within{outline:3px solid var(--cyan);outline-offset:2px}
+button:disabled{cursor:default}
+h1,h2,h3,p{margin:0}
+[hidden]{display:none!important}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.ic{width:20px;height:20px;flex:none}
+.gl{width:16px;height:16px;flex:none}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- stage and rig (test tooling stays neutral so the product's color reads as the product) ---------- */
+.stage{min-height:100%;display:grid;grid-template-columns:minmax(260px,330px) 390px;gap:44px;justify-content:center;align-items:start;padding:24px 16px}
+.rig{position:sticky;top:24px;max-height:calc(100dvh - 48px);overflow:auto;display:flex;flex-direction:column;gap:14px;padding:4px}
+.rig>*{flex:none}
+.rig-head{display:flex;align-items:center;gap:12px}
+.rig-head h1{font-size:1.35rem;font-weight:800;letter-spacing:-.02em}
+.rig-head p{font-size:.8rem;color:var(--muted)}
+.rig-close{display:none;margin-left:auto;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-weight:600;font-size:.85rem}
+.panel{background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e1),var(--hi);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.panel h2{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+.roles{display:flex;flex-direction:column;gap:5px}
+.roles h3{font-size:.72rem;font-weight:700;color:var(--muted);margin-top:4px}
+.role{display:flex;gap:10px;align-items:center;padding:6px 9px;border:1.5px solid var(--line);border-radius:10px;width:100%}
+.role b{display:block;font-size:.88rem;line-height:1.25}
+.role small{color:var(--muted);font-size:.76rem;display:block;line-height:1.25}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.78rem;background:var(--raised);flex:none}
+.role[aria-pressed="true"]{border-color:var(--ink);background:var(--raised)}
+.role[aria-pressed="true"] .av{background:var(--ink);color:var(--surface)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.9rem}
+.row small{display:block;color:var(--muted);font-size:.76rem}
+.switch{width:46px;height:28px;border-radius:99px;background:var(--raised);border:1.5px solid var(--line);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:var(--muted);transition:transform .15s}
+.switch[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+.switch[aria-checked="true"]::after{transform:translateX(18px);background:var(--surface)}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;text-align:center;padding:8px 6px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:34px;height:34px;border:1.5px solid var(--line);border-radius:9px;display:grid;place-items:center}
+.stepper input{font:inherit;font-weight:700;font-size:.88rem;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:9px;height:34px;padding:0 6px;width:112px;text-align:center}
+#todayIn{width:142px}
+.ghost{padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;font-weight:600;font-size:.85rem;text-align:center}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.trio .ghost{padding:8px 4px;font-size:.78rem;line-height:1.25}
+.tasks{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:7px;font-size:.86rem}
+.scope{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:.82rem;margin:0}
+.scope dt{font-weight:700}
+.scope dd{margin:0;color:var(--muted)}
+.note{font-size:.8rem;color:var(--muted)}
+
+/* ---------- device ---------- */
+.device{width:390px;height:min(844px,calc(100dvh - 48px));position:sticky;top:24px;background:var(--app-bg);border:1px solid var(--card-line);border-radius:38px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 2px;font-size:.8rem;font-weight:700;flex:none}
+.sb-right{display:flex;align-items:center;gap:10px;color:var(--muted)}
+#rigOpen{display:none;padding:6px 10px;border:1.5px solid var(--line);border-radius:99px;font-size:.75rem;font-weight:700;color:var(--ink)}
+.appbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 16px 8px}
+.wordmark{display:inline-flex;align-items:flex-start;gap:3px;font-size:1.2rem;font-weight:800;letter-spacing:-.035em}
+.spark{width:13px;height:13px;margin-top:1px;fill:var(--c-mag);filter:drop-shadow(0 0 5px var(--primary-glow))}
+.who{display:inline-flex;align-items:center;gap:7px;padding:3px 11px 3px 3px;border-radius:99px;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e1),var(--hi);font-size:.8rem;font-weight:700}
+.who .av{width:26px;height:26px;background:var(--c-yel);color:#1c1600}
+.offline{flex:none;background:var(--yel-bg);color:var(--yel);font-size:.8rem;font-weight:600;padding:7px 18px}
+#view{flex:1;overflow-y:auto;padding:4px 16px 28px;display:flex;flex-direction:column;gap:14px;outline:0}
+#view>*,.sh-body>*{flex:none}
+.tabs{flex:none;display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-top:1px solid var(--card-line);box-shadow:0 -8px 24px rgba(10,14,25,.08),var(--hi);padding-bottom:env(safe-area-inset-bottom,0);position:relative;z-index:1}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 11px;font-size:.72rem;font-weight:700;color:var(--muted);position:relative}
+.tab[aria-current="page"]{color:var(--mag)}
+.tab[aria-current="page"]::before{content:"";position:absolute;top:-1px;left:50%;width:34px;height:3px;margin-left:-17px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--c-cyan),var(--c-mag));box-shadow:0 2px 10px var(--primary-glow)}
+.badge{position:absolute;top:5px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:linear-gradient(180deg,var(--primary-a),var(--primary-b));color:var(--on-primary);font-size:.68rem;display:grid;place-items:center;box-shadow:0 2px 8px var(--primary-glow)}
+
+/* ---------- raised surfaces ---------- */
+.card,.list,.tile,.sum>div,.box,.blk{background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e1),var(--hi)}
+
+/* ---------- app content ---------- */
+.kicker{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.kicker em{font-style:normal;color:var(--mag)}
+.title{font-size:1.75rem;font-weight:800;letter-spacing:-.03em;line-height:1.08;text-wrap:balance}
+.sub{font-size:1rem;color:var(--muted);font-weight:500}
+.head{display:flex;flex-direction:column;gap:5px;min-width:0}
+.headrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.headbtns{display:flex;gap:6px;flex:none}
+.pill-btn,.navd{display:inline-flex;align-items:center;border-radius:99px;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e1),var(--hi);font-weight:700}
+.pill-btn{gap:6px;padding:8px 12px;font-size:.82rem;flex:none}
+.pill-btn.icon-only{padding:8px 9px}
+.navrow{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px}
+.navgrp{display:flex;gap:6px}
+.navd{gap:1px;padding:6px 9px;font-size:.8rem}
+.navd .ic{width:16px;height:16px}
+.navd:disabled{opacity:.35;box-shadow:none}
+.backbtn{display:inline-flex;align-items:center;gap:2px;font-weight:700;font-size:.9rem;color:var(--muted);padding:8px 8px 8px 0;margin-left:-4px}
+.dayhead{display:flex;gap:14px;align-items:center}
+.datetile{width:60px;flex:none;border-radius:15px;overflow:hidden;text-align:center;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e2),var(--hi)}
+.datetile .m{display:block;padding:3px 0 2px;font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--on-primary);background:linear-gradient(180deg,var(--primary-a),var(--primary-b))}
+.datetile b{display:block;font-size:1.6rem;font-weight:800;line-height:1.15;letter-spacing:-.02em}
+.datetile .w{display:block;padding-bottom:5px;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.datetile.is-today{box-shadow:0 0 0 2px var(--c-mag),0 8px 22px var(--primary-glow)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px 5px 7px;border-radius:99px;font-size:.8rem;font-weight:700;white-space:nowrap;align-self:flex-start}
+.chip--confirmed{background:var(--ok-bg);color:var(--ok)}
+.chip--ready{background:var(--cyan-bg);color:var(--cyan)}
+.chip--needs{background:var(--yel-bg);color:var(--yel)}
+.chip--live{background:var(--mag-bg);color:var(--mag);padding-left:11px;gap:9px;white-space:normal;box-shadow:0 0 0 1px var(--primary-glow),0 4px 14px var(--primary-glow)}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--c-mag);position:relative;flex:none}
+.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--c-mag);animation:ring 1.6s ease-out infinite}
+@keyframes ring{from{transform:scale(.5);opacity:.9}to{transform:scale(1.35);opacity:0}}
+.card{border-radius:var(--r);padding:14px}
+.card h3,.sec{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+/* The Next up card is the one always-dark, fully lit surface: a stage under cyan and magenta gels. */
+.next{position:relative;overflow:hidden;border-radius:var(--r);padding:17px 16px;display:flex;flex-direction:column;gap:2px;color:#ffffff;border:1px solid rgba(255,255,255,.10);
+  background:radial-gradient(95% 130% at 0% 0%,rgba(25,200,230,.55),transparent 58%),radial-gradient(95% 130% at 100% 100%,rgba(236,44,154,.60),transparent 58%),linear-gradient(160deg,#181d30,#0b0e18);
+  box-shadow:var(--e2),inset 0 1px 0 rgba(255,255,255,.14)}
+.next .lbl{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;opacity:.85}
+.next .big{font-size:1.85rem;font-weight:800;letter-spacing:-.03em;line-height:1.12;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.next .in{font-size:.95rem;font-weight:600;opacity:.9}
+.alert{display:flex;gap:10px;align-items:center;width:100%;background:var(--yel-bg);color:var(--yel);border-radius:var(--r);padding:12px 14px;font-weight:700;font-size:.9rem;box-shadow:var(--e1)}
+.alert span{flex:1}
+.alert small{display:block;font-weight:500}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:3px;min-height:108px;min-width:0}
+.tile .th{display:flex;align-items:center;gap:6px;font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.tile .th .ic{width:18px;height:18px;color:var(--cyan)}
+.tile .tv{font-weight:700;font-size:.96rem;line-height:1.25;overflow-wrap:anywhere}
+.tile .ts{font-size:.9rem;font-weight:600;color:var(--muted)}
+.tile .ta{margin-top:auto;padding-top:4px;display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:700;color:var(--cyan)}
+.tile .ta .ic{width:17px;height:17px}
+.tiles .tile:only-child{grid-column:1/-1;min-height:0}
+.gap{color:var(--yel);font-weight:700}
+.tile.is-gap{border:1.5px dashed var(--yel);box-shadow:none}
+.tl{display:flex;flex-direction:column;margin-top:8px}
+.tl-row{display:grid;grid-template-columns:88px 1fr auto;gap:8px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line);width:100%}
+.tl-row:first-child{border-top:0}
+.tl-row .t{font-weight:800;font-size:1.05rem}
+.tl-row .n small{display:block;color:var(--muted);font-size:.8rem;font-weight:500}
+.tl-row .go{display:inline-flex;align-items:center;font-size:.78rem;font-weight:700;color:var(--cyan)}
+.tl-row .go .ic{width:15px;height:15px}
+.tl-row.past{color:var(--muted)}
+.tl-row.past .t{font-weight:600}
+.tl-row.next-up .t,.tl-row.next-up .n{color:var(--cyan)}
+.tl-row.live .t,.tl-row.live .n{color:var(--mag)}
+.tl-row .tag{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan)}
+.tl-row.live .tag{color:var(--mag)}
+.kv{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.kv b{font-size:1rem}
+.kv span{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+.doc{display:flex;align-items:center;gap:12px;width:100%}
+.doc .fmeta{flex:1;min-width:0}
+.doc b{display:block;font-size:.95rem;overflow-wrap:anywhere}
+.doc small{color:var(--muted);font-size:.8rem}
+.doc .go{font-size:.8rem;font-weight:700;color:var(--cyan)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:12px 16px;border-radius:14px;font-weight:800;font-size:1rem;text-align:center}
+.btn--primary,.sbtn.sbtn--pri,.blk button{background:linear-gradient(180deg,var(--primary-a),var(--primary-b));color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 18px var(--primary-glow)}
+.btn--primary:disabled{opacity:.4;box-shadow:none}
+.btn--line{background:var(--card);border:1px solid var(--card-line);box-shadow:var(--e1),var(--hi)}
+.btn--blocked{border:1.5px dashed var(--yel);background:var(--yel-bg);color:var(--yel);flex-direction:column;gap:0}
+.btn--blocked small{font-weight:600;font-size:.8rem}
+.modes{display:flex;background:var(--raised);border-radius:13px;padding:4px;gap:4px;box-shadow:inset 0 1px 3px rgba(10,14,25,.10)}
+.modes button{flex:1;text-align:center;padding:9px;border-radius:10px;font-weight:700;font-size:.9rem;color:var(--muted)}
+.modes button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--e1),var(--hi)}
+.prog .pg{margin-top:6px;font-size:1rem;font-weight:600;color:var(--muted)}
+.prog .pg b{font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.meter{height:9px;border-radius:99px;background:var(--raised);overflow:hidden;margin-top:8px;box-shadow:inset 0 1px 2px rgba(10,14,25,.14)}
+.meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c-cyan),var(--c-mag));box-shadow:0 0 10px var(--primary-glow)}
+.nextstep{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.nextstep .ns{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.nextstep small{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan)}
+.nextstep b{display:inline-flex;align-items:center;gap:6px;font-size:1.02rem}
+.nextstep .ns>span{font-size:.82rem;color:var(--muted)}
+.list{display:flex;flex-direction:column;border-radius:var(--r);overflow:hidden}
+.grow{display:flex;align-items:center;gap:12px;padding:13px 12px;border-top:1px solid var(--line);width:100%;min-height:60px}
+.grow:first-child{border-top:0}
+.gi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--cyan-bg);color:var(--cyan);box-shadow:var(--hi)}
+.grow .gt{flex:1;min-width:0}
+.grow .gt b{display:block;font-size:.98rem}
+.grow .gt small{color:var(--muted);font-size:.8rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gs{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.gs--ok{color:var(--ok)} .gs--needs{color:var(--yel)} .gs--opt{color:var(--muted)}
+.stamp{display:flex;align-items:center;gap:12px;border-radius:var(--r);padding:15px 14px;font-weight:800;font-size:1.05rem;color:var(--ok);background:var(--ok-bg);box-shadow:var(--e1),var(--hi)}
+.stamp .gl{width:30px;height:30px}
+.stamp small{display:block;font-weight:500;font-size:.82rem}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sum>div{border-radius:14px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:3px}
+.sum b{font-size:1.7rem;font-weight:800;line-height:1;letter-spacing:-.03em}
+.sum span{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700}
+.sum .st--ok b{color:var(--ok)} .sum .st--ready b{color:var(--cyan)} .sum .st--needs b{color:var(--yel)}
+.drow{display:flex;align-items:center;gap:12px;padding:12px;border-top:1px solid var(--line);width:100%}
+.drow:first-child{border-top:0}
+.drow .dd{width:46px;text-align:center;flex:none}
+.drow .dd small{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.drow .dd b{font-size:1.4rem;font-weight:800;line-height:1}
+.drow .dm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.drow .dm b{font-size:1rem}
+.drow .dm small{color:var(--muted);font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow .dm small em{font-style:normal;font-weight:700;color:var(--mag)}
+.drow.is-today{background:linear-gradient(90deg,var(--mag-bg),transparent 70%)}
+.drow.is-today .dd b{color:var(--mag)}
+.drow.is-off .dm b{font-weight:600;color:var(--muted)}
+.chg{display:flex;gap:10px;padding:13px 12px;border-top:1px solid var(--line);width:100%;align-items:flex-start}
+.chg:first-child{border-top:0}
+.vb{width:32px;height:32px;border-radius:10px;background:var(--raised);display:grid;place-items:center;flex:none;position:relative;box-shadow:var(--hi)}
+.vb .ic{width:17px;height:17px}
+.chg.is-new .vb::after{content:"";position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:var(--c-mag);border:2px solid var(--surface);box-shadow:0 0 8px var(--primary-glow)}
+.chg .cb{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.chg .hl{font-size:.95rem}
+.chg .hl b{font-weight:800}
+.chg .cb .diff{font-size:.95rem;overflow-wrap:anywhere}
+.chg .cb .diff s{color:var(--muted)}
+.chg .cb small{color:var(--muted);font-size:.78rem}
+.chg.is-done .hl{text-decoration:line-through;color:var(--muted)}
+.chg .res{display:flex;align-items:center;gap:6px;color:var(--ok);font-weight:700;font-size:.85rem}
+.tagx{flex:none;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:3px 7px;border-radius:5px;margin-top:2px}
+.tag--open{background:var(--yel-bg);color:var(--yel)}
+.tag--done{background:var(--ok-bg);color:var(--ok)}
+.empty{color:var(--muted);text-align:center;padding:24px 10px}
+.emptycard{display:flex;flex-direction:column;gap:10px;text-align:center;padding:22px 16px}
+.emptycard b{font-size:1.1rem}
+
+/* ---------- sheet ---------- */
+.scrim{position:absolute;inset:0;background:rgba(5,8,14,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:20}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88%;z-index:21;background:var(--bg);border-radius:24px 24px 0 0;display:flex;flex-direction:column;box-shadow:0 -14px 50px rgba(0,0,0,.4),var(--hi);animation:up .2s ease-out}
+.sheet::before{content:"";flex:none;width:40px;height:4px;border-radius:99px;background:var(--line);margin:8px auto 0}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.sh-head{padding:10px 16px 10px;display:flex;gap:12px;align-items:flex-start;flex:none}
+.sh-head div{flex:1;min-width:0}
+.sh-head h2{font-size:1.28rem;font-weight:800;letter-spacing:-.025em;text-wrap:balance}
+.sh-head p{font-size:.85rem;color:var(--muted)}
+.sh-ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none;background:var(--yel-bg);color:var(--yel);box-shadow:var(--hi)}
+.sh-ic .gl{width:22px;height:22px}
+.sh-x{padding:8px 12px;border-radius:10px;background:var(--raised);font-weight:700;font-size:.85rem}
+.sh-body{overflow-y:auto;padding:4px 16px 20px;display:flex;flex-direction:column;gap:16px}
+.sh-foot{flex:none;padding:10px 16px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label,.fld .fl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem}
+.req{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:2px 6px;border-radius:5px;background:var(--raised);color:var(--muted)}
+.fld.is-missing .req{background:var(--yel-bg);color:var(--yel)}
+.fld input,.fld select{font:inherit;font-size:1rem;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:11px;padding:0 12px;width:100%;height:48px;box-shadow:inset 0 1px 2px rgba(10,14,25,.07)}
+.fld.is-missing input,.fld.is-missing select{border-color:var(--yel);border-style:dashed}
+.fld.is-bad input{border-color:var(--bad)}
+.errmsg{color:var(--bad);font-size:.82rem;font-weight:700}
+.unit{display:flex;align-items:center;gap:10px}
+.unit input{flex:1;min-width:0}
+.unit span{font-weight:700;color:var(--muted);flex:none}
+.fld .val{font-size:1.05rem;font-weight:600;overflow-wrap:anywhere}
+.ask{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:.86rem;font-weight:700;color:var(--cyan);padding:4px 0}
+.ask .ic,.blk button .ic{width:18px;height:18px}
+.fld .asked{font-size:.82rem;font-weight:600;color:var(--muted)}
+.blk{display:flex;gap:10px;align-items:center;border-radius:13px;padding:12px}
+.blk div{flex:1;min-width:0}
+.blk b{display:block;font-size:.98rem}
+.blk small{color:var(--muted);font-size:.82rem;display:block}
+.blk button{flex:none;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.85rem}
+.blk .asked{flex:none;font-size:.8rem;font-weight:700;color:var(--muted)}
+.box{border-radius:13px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.box.box--bad{border-color:var(--bad);background:var(--bad-bg)}
+.box-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.box-h b{font-size:1rem;overflow-wrap:anywhere}
+.linkbtn{font-weight:700;font-size:.82rem;color:var(--cyan);padding:4px 0;flex:none}
+.linkbtn.danger{color:var(--bad);align-self:flex-start}
+.file{display:flex;gap:10px;align-items:center}
+.file .fmeta{min-width:0}
+.file b{display:block;font-size:.95rem;overflow-wrap:anywhere}
+.file small{color:var(--muted);font-size:.8rem;display:block}
+.frow{display:flex;gap:8px;flex-wrap:wrap}
+.sbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:10px;border:1px solid var(--card-line);background:var(--card);box-shadow:var(--e1),var(--hi);font-weight:700;font-size:.85rem;cursor:pointer;position:relative}
+.sbtn.sbtn--pri{border-color:transparent}
+.sbtn.sbtn--bad{background:var(--bad);color:var(--surface);border-color:transparent}
+.sbtn .ic{width:16px;height:16px}
+.ph{display:flex;gap:10px;align-items:center}
+.ph b{display:block;font-size:.98rem}
+.ph small{display:block;color:var(--muted);font-size:.8rem}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{padding:7px 11px;border-radius:99px;border:1.5px solid var(--line);font-size:.8rem;font-weight:700;color:var(--muted)}
+.pchip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.pchip:disabled{opacity:.75}
+/* The shared day sheet previews as a sheet of paper, whatever the theme. */
+.paper{background:#fffdf7;color:#1c1c1c;border-radius:5px;padding:16px 16px 18px;margin:4px 6px 0;transform:rotate(-.5deg);box-shadow:0 1px 2px rgba(0,0,0,.18),0 16px 34px rgba(0,0,0,.22)}
+pre.out{margin:0;font:12.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
+.targets{display:flex;justify-content:space-around;padding:4px 0 2px}
+.target{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.78rem;font-weight:700;min-width:72px}
+.tg{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#ffffff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),var(--e1)}
+.tg .ic{width:24px;height:24px}
+.tg--msg{background:linear-gradient(180deg,#35d07c,#149a52)}
+.tg--mail{background:linear-gradient(180deg,#27c3e6,#0b84a8)}
+.tg--copy{background:linear-gradient(180deg,var(--primary-a),var(--primary-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px var(--primary-glow)}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:30;background:var(--ink);color:var(--surface);padding:12px 14px;border-radius:13px;font-weight:600;font-size:.9rem;text-align:center;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;box-shadow:var(--e2)}
+.toast.on{opacity:1;transform:none}
+
+@media (max-width:860px){
+  body{background:var(--bg)}
+  .stage{display:block;padding:0;height:100%}
+  .device{width:100%;height:100dvh;border:0;border-radius:0;box-shadow:none;position:relative;top:0}
+  .statusbar{padding-top:max(10px,env(safe-area-inset-top,0px))}
+  #rigOpen{display:block}
+  .rig{position:fixed;inset:0;z-index:60;max-height:none;background:var(--stage);padding:max(16px,env(safe-area-inset-top,0px)) 16px 24px;display:none}
+  .rig.open{display:flex}
+  .rig-close{display:block}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="rig" id="rig" aria-label="Prototype controls">
+    <div class="rig-head">
+      <svg width="40" height="36" viewBox="0 0 40 36" aria-hidden="true"><circle cx="14" cy="13" r="11" fill="#22d3ee" opacity=".85"/><circle cx="26" cy="13" r="11" fill="#f43fb5" opacity=".8"/><circle cx="20" cy="23" r="11" fill="#facc15" opacity=".85"/></svg>
+      <div><h1>DaySheet</h1><p>Prototype shell · sample data</p></div>
+      <button class="rig-close" data-action="rig-close">Back to app</button>
+    </div>
+
+    <div class="panel">
+      <h2>Viewing as</h2>
+      <div class="roles" id="roles"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Test conditions</h2>
+      <div class="row"><label for="todayIn">Today is</label><div class="stepper"><button data-action="today-step" data-step="-1" aria-label="Previous day">&#8249;</button><input type="date" id="todayIn"><button data-action="today-step" data-step="1" aria-label="Next day">&#8250;</button></div></div>
+      <div class="row"><label for="nowIn">Time is</label><div class="stepper"><button data-action="time-step" data-step="-30" aria-label="30 minutes earlier">&#8249;</button><input type="time" id="nowIn"><button data-action="time-step" data-step="30" aria-label="30 minutes later">&#8250;</button></div></div>
+      <div class="row"><span>Offline<small>Simulate a dead zone</small></span><button class="switch" role="switch" id="swOff" data-action="offline" aria-label="Offline"></button></div>
+      <div class="seg" id="themeSeg"><button data-action="theme" data-theme-val="auto">Auto</button><button data-action="theme" data-theme-val="light">Light</button><button data-action="theme" data-theme-val="dark">Dark</button></div>
+      <div class="row"><span>Data<small id="dataNote"></small></span></div>
+      <div class="trio">
+        <button class="ghost" data-action="reset" title="Restore the testing defaults">Reset sample data</button>
+        <button class="ghost" data-action="clear-data" title="Empty every value so the tour is filled in from scratch">Clear data</button>
+        <button class="ghost" data-action="fill-data" title="Complete and confirm every date">Fill all data</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Tasks to try</h2>
+      <ol class="tasks">
+        <li>What is on today besides the show, and when?</li>
+        <li>Step to Tuesday from the day view. Where does the van go first?</li>
+        <li>Try to confirm Chattanooga. Why can't you? Fix it and confirm.</li>
+        <li>As Theo, ask for something missing. As Riley, supply it. Read Changes as Evan.</li>
+        <li>Send the stage plot to the Chattanooga venue, then find it as Lena.</li>
+        <li>Open People and add Sam to another show. Check Sam's view.</li>
+        <li>Add an after-party to a confirmed date. What happens to its status?</li>
+        <li>Clear data, then build a tour from scratch: name it, add three dates, and advance one.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>Prototype scope</h2>
+      <dl class="scope">
+        <dt>Built</dt><dd>Building and editing a tour's dates, Today, tour list, date advance, derived readiness, blocked confirmation, other events on a day, access by person and by date, requests and change log, in-progress status</dd>
+        <dt>Simulated</dt><dd>Sharing links, sending by text and email, map routes, offline, the clock</dd>
+        <dt>Deferred</dt><dd>Adding or removing people, a second full show on one day, expenses, routing optimization, settlement, reporting</dd>
+      </dl>
+    </div>
+  </aside>
+
+  <div class="device" id="device">
+    <div class="statusbar"><span class="num" id="clock"></span><span class="sb-right"><span id="net">LTE</span><button id="rigOpen" data-action="rig-open">Prototype</button></span></div>
+    <header class="appbar"><span class="wordmark">DaySheet<svg class="spark" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0C10.9 5.5 14.5 9.1 20 10C14.5 10.9 10.9 14.5 10 20C9.1 14.5 5.5 10.9 0 10C5.5 9.1 9.1 5.5 10 0Z"/></svg></span><button class="who" id="who"></button></header>
+    <div class="offline" id="offlineBar" hidden>Offline. Showing the last saved copy.</div>
+    <main id="view" tabindex="-1"></main>
+    <nav class="tabs" id="tabs" aria-label="Main"></nav>
+    <div class="scrim" id="scrim" data-action="close-sheet" hidden></div>
+    <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden></section>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const KEY = 'daysheet-proto-v5';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+
+/* The Advance: requirement groups and typed fields. `req` fields decide readiness. */
+const GROUPS = [
+  {id:'venue', name:'Venue', icon:'building', fields:[
+    {id:'venueName', label:'Venue name', req:1},
+    {id:'address', label:'Street address', req:1},
+    {id:'parking', label:'Parking and load-in door'},
+    {id:'wifi', label:'Wi-Fi'}]},
+  {id:'contacts', name:'Contacts', icon:'people', fields:[
+    {id:'dayContact', label:'Day-of contact', req:1},
+    {id:'dayPhone', label:'Day-of phone', req:1, type:'tel'},
+    {id:'dayEmail', label:'Day-of email', type:'email'},
+    {id:'soundContact', label:'Sound engineer'}]},
+  {id:'schedule', name:'Schedule', icon:'clock', fields:[
+    {id:'loadIn', label:'Load-in', short:'Load-in', req:1, type:'time'},
+    {id:'soundcheck', label:'Soundcheck', short:'Soundcheck', req:1, type:'time'},
+    {id:'doors', label:'Doors', short:'Doors', req:1, type:'time'},
+    {id:'setTime', label:'Set time', short:'Your set', req:1, type:'time'},
+    {id:'setLength', label:'Set length', type:'number', suf:'min'},
+    {id:'curfew', label:'Curfew', short:'Curfew', type:'time'}]},
+  {id:'extras', name:'Other events', icon:'flag', fields:[]},
+  {id:'lodging', name:'Lodging', icon:'bed', fields:[
+    {id:'lodgingPlace', label:'Where you are sleeping', req:1},
+    {id:'lodgingAddress', label:'Address'},
+    {id:'checkInBy', label:'Check in by', type:'time'},
+    {id:'lodgingNotes', label:'Check-in notes'}]},
+  {id:'routing', name:'Routing', icon:'van', fields:[
+    {id:'departure', label:'Van call', short:'Van call', req:1, type:'time'},
+    {id:'wheelsUp', label:'Departure', type:'time'},
+    {id:'driveMin', label:'Drive time', type:'number', suf:'min', dur:1},
+    {id:'firstStop', label:'First stop', type:'select', options:['Venue','Lodging'], showOnly:1},
+    {id:'routeLink', label:'Saved route link', type:'url'}]},
+  {id:'production', name:'Production', icon:'mic', fields:[
+    {id:'pa', label:'PA and backline'},
+    {id:'plotSent', label:'Stage plot sent on', type:'date'}]},
+  {id:'hospitality', name:'Hospitality', icon:'cup', fields:[
+    {id:'meals', label:'Meals', type:'select', options:['Buyout','Meal provided','None']},
+    {id:'buyout', label:'Buyout per person', type:'number', pre:'$'},
+    {id:'guestList', label:'Guest list', type:'number', suf:'spots'}]},
+  {id:'business', name:'Business', icon:'cash', fields:[
+    {id:'dealType', label:'Deal', req:1, type:'select', options:['Guarantee','Door split','Guarantee plus split','Other']},
+    {id:'guarantee', label:'Guarantee', type:'number', pre:'$'},
+    {id:'payMethod', label:'Paid by', type:'select', options:['Cash','Check','Bank transfer']},
+    {id:'settleWith', label:'Settle with'},
+    {id:'merchCut', label:'Venue merch cut', type:'number', suf:'%'}]}
+];
+/* Lighter-weight stops on the same day: promos, in-stores, after-parties. */
+const EVF = [
+  {id:'name', label:'Event name', req:1},
+  {id:'type', label:'Type', type:'select', options:['Promo','In-store','Radio','After-party','Other']},
+  {id:'start', label:'Starts', req:1, type:'time'},
+  {id:'len', label:'Length', type:'number', suf:'min'},
+  {id:'where', label:'Where', req:1}];
+const FIELD = {};
+GROUPS.forEach(g => g.fields.forEach(f => { f.group = g.id; FIELD[f.id] = f; }));
+const GROUP = Object.fromEntries(GROUPS.map(g => [g.id, g]));
+const ALL = GROUPS.map(g => g.id);
+const TIMELINE = ['departure','loadIn','soundcheck','doors','setTime','curfew'];
+const ORDER = ['evan','riley','theo','lena','sam','dana'];
+
+function seed() {
+  return {
+    role:'evan', theme:'auto', offline:false, today:'2026-11-14', now:13 * 60 + 20, tab:'today', route:null, todayMode:'sheet', nextId:10,
+    plot:{name:'LowTide-stage-plot.pdf', size:'184 KB'},
+    tour:{name:'Fall run', artist:'Low Tide'},
+    /* One access model for everyone: which dates, which sections they see, which they can edit. */
+    people:{
+      evan:{name:'Evan', kind:'band', dates:'all', see:ALL.slice(), edit:ALL.slice(), hide:[], confirm:true, manage:true},
+      riley:{name:'Riley', kind:'band', dates:'all', see:ALL.slice(), edit:['lodging','routing','production','hospitality'], hide:[]},
+      theo:{name:'Theo', kind:'band', dates:'all', see:ALL.slice(), edit:[], hide:[]},
+      lena:{name:'Lena', kind:'guest', tag:'Venue contact', dates:['d6'], see:['venue','contacts','schedule','production','hospitality','business'], edit:[], hide:[]},
+      sam:{name:'Sam', kind:'guest', tag:'Guest artist', dates:['d5','d6'], see:['venue','contacts','schedule','extras','lodging','routing','production','hospitality'], edit:[], hide:[]},
+      dana:{name:'Dana', kind:'guest', tag:'At home', dates:'all', see:['venue','schedule','extras','lodging','routing'], edit:[], hide:['parking','wifi']}
+    },
+    seen:{evan:['c1','c2','c3','c4'], riley:[], theo:['c4'], lena:[], sam:[], dana:[]},
+    changes:[
+      {id:'c3', dateId:'d5', group:'schedule', field:'setTime', kind:'changed', label:'Set time', from:'9:30 PM', to:'10:00 PM', who:'Evan', when:'Today, 11:42 AM'},
+      {id:'c4', dateId:'d6', group:'lodging', field:'lodgingPlace', kind:'request', label:'Where you are sleeping', who:'Theo', when:'Today, 9:05 AM', open:true},
+      {id:'c2', dateId:'d3', group:'schedule', field:'loadIn', kind:'changed', label:'Load-in', from:'4:00 PM', to:'3:00 PM', who:'Evan', when:'Yesterday, 6:15 PM'},
+      {id:'c1', dateId:'d2', group:'venue', field:'wifi', kind:'request', label:'Wi-Fi', who:'Riley', when:'Thursday, 2:30 PM', open:false, done:'Evan added it'}],
+    dates:[
+      {id:'d1', date:'2026-11-12', city:'Athens, GA', kind:'show', confirmed:{by:'Evan', when:'Nov 2'}, events:[], v:{
+        venueName:'The Lantern Room', address:'212 Hull St, Athens, GA', parking:'Alley behind the building, blue door', wifi:'lantern-guest / lowlights',
+        dayContact:'Priya Raman', dayPhone:'(555) 014-2271', dayEmail:'priya@lanternroom.example', soundContact:'Dez, house engineer',
+        departure:'12:30', wheelsUp:'12:45', driveMin:'80', loadIn:'16:00', soundcheck:'17:00', doors:'20:00', setTime:'21:45', setLength:'60', curfew:'00:00',
+        lodgingPlace:"Priya's guest house", lodgingNotes:'Key under the mat', pa:'Full PA, house drum kit', plotSent:'2026-10-28',
+        meals:'Buyout', buyout:'15', guestList:'6', dealType:'Guarantee', guarantee:'400', payMethod:'Cash', settleWith:'Priya, after load-out', merchCut:'0'}},
+      {id:'d2', date:'2026-11-13', city:'Asheville, NC', kind:'show', confirmed:{by:'Evan', when:'Nov 4'}, events:[], v:{
+        venueName:'Gristmill Hall', address:'77 Depot Row, Asheville, NC', parking:'Gravel lot, load in through the roll-up door', wifi:'gristmill / flourpower',
+        dayContact:'Tomas Reyes', dayPhone:'(555) 013-8840', dayEmail:'tomas@gristmillhall.example',
+        departure:'10:00', wheelsUp:'10:15', driveMin:'195', loadIn:'15:30', soundcheck:'16:45', doors:'19:00', setTime:'21:00', setLength:'45', curfew:'23:00',
+        lodgingPlace:'Blue Ridge Bunkhouse', lodgingAddress:'9 Haywood Ct, Asheville, NC', lodgingNotes:'Self check-in, code 4471',
+        pa:'Full PA, no backline', plotSent:'2026-10-30', meals:'Meal provided', guestList:'4',
+        dealType:'Guarantee plus split', guarantee:'300', payMethod:'Check', settleWith:'Tomas, at close', merchCut:'15'}},
+      {id:'d3', date:'2026-11-14', city:'Knoxville, TN', kind:'show', confirmed:{by:'Evan', when:'Nov 6'},
+        events:[{id:'e1', name:'WKNX radio session', type:'Radio', start:'13:45', len:'30', where:'600 Gay St, Knoxville, TN'}], v:{
+        venueName:'Signal House', address:'418 Jackson Ave, Knoxville, TN', parking:'Loading zone on Jackson, side door with the red light',
+        dayContact:'Marcus Bell', dayPhone:'(555) 010-7714', dayEmail:'marcus@signalhouse.example', soundContact:'Ana, front of house',
+        departure:'10:30', wheelsUp:'10:45', driveMin:'125', firstStop:'Venue', routeLink:'https://maps.example/route/avl-knx',
+        loadIn:'15:00', soundcheck:'16:30', doors:'19:00', setTime:'21:15', setLength:'45', curfew:'23:30',
+        lodgingPlace:'Riverbend Motor Lodge', lodgingAddress:'1840 Chapman Hwy, Knoxville, TN', checkInBy:'01:00', lodgingNotes:'Confirmation RB-20417',
+        pa:'Full PA, shared drum kit', plotSent:'2026-11-01', meals:'Buyout', buyout:'12', guestList:'5',
+        dealType:'Door split', payMethod:'Cash', settleWith:'Marcus, at the bar', merchCut:'0'}},
+      {id:'d4', date:'2026-11-15', city:'Off day', kind:'off', confirmed:null, events:[], v:{departure:'11:00', wheelsUp:'11:15', driveMin:'165'}},
+      {id:'d5', date:'2026-11-16', city:'Nashville, TN', kind:'show', confirmed:null,
+        events:[{id:'e2', name:'After-party', type:'After-party', start:'23:30', len:'90', where:'The Velvet Annex, 911 Gallatin Ave'}], v:{
+        venueName:'The Tin Parlor', address:'905 Gallatin Ave, Nashville, TN', parking:'Street parking, load in from the front',
+        dayContact:'Jo Whitfield', dayPhone:'(555) 012-3305',
+        departure:'14:00', wheelsUp:'14:15', driveMin:'15', loadIn:'17:00', soundcheck:'18:00', doors:'20:00', setTime:'22:00', setLength:'40',
+        lodgingPlace:"Jo's place, second night", pa:'Vocal PA only', dealType:'Door split'}},
+      {id:'d6', date:'2026-11-17', city:'Chattanooga, TN', kind:'show', confirmed:null, events:[], v:{
+        venueName:'Northshore Social', address:'31 Frazier Ave, Chattanooga, TN',
+        dayContact:'Lena Ortiz', dayPhone:'(555) 011-6092', dayEmail:'lena@northshoresocial.example',
+        departure:'11:30', wheelsUp:'11:45', driveMin:'130', firstStop:'Lodging', soundcheck:'17:30', doors:'19:30', setTime:'21:00',
+        dealType:'Guarantee', guarantee:'250'}},
+      {id:'d7', date:'2026-11-18', city:'Birmingham, AL', kind:'show', confirmed:null, events:[], v:{
+        venueName:'Copper Still', address:'2210 2nd Ave N, Birmingham, AL', setTime:'22:00'}}
+    ]
+  };
+}
+
+/* Placeholder values used by "Fill all data" for anything the sample tour leaves empty. */
+const DUMMY = {
+  venueName:'The Room', address:'100 Main St', parking:'Lot behind the venue, stage door', wifi:'venue-guest / welcome',
+  dayContact:'Alex Morgan', dayPhone:'(555) 010-0100', dayEmail:'booking@venue.example', soundContact:'House engineer',
+  loadIn:'16:00', soundcheck:'17:00', doors:'19:00', setTime:'21:00', setLength:'45', curfew:'23:30',
+  lodgingPlace:'Roadside Inn', lodgingAddress:'250 Frontage Rd', checkInBy:'01:00', lodgingNotes:'Confirmation on file',
+  departure:'11:00', wheelsUp:'11:15', driveMin:'120', firstStop:'Venue', routeLink:'https://maps.example/route',
+  pa:'Full PA, no backline', plotSent:'2026-11-05', meals:'Buyout', buyout:'15', guestList:'4',
+  dealType:'Guarantee', guarantee:'300', payMethod:'Cash', settleWith:'Venue manager, at close', merchCut:'0'
+};
+/* Clear and Fill keep the viewer, clock and theme you are testing with; only the tour data changes. */
+function keepSession(n) { ['role','theme','offline','today','now'].forEach(k => { n[k] = S[k]; }); n.tab = 'tour'; return n; }
+function clearedData() {
+  const n = keepSession(seed());
+  n.dates = []; n.tour = {name:'', artist:''};
+  ORDER.forEach(id => { if (Array.isArray(n.people[id].dates)) n.people[id].dates = []; });
+  n.plot = null; n.changes = []; ORDER.forEach(id => { n.seen[id] = []; });
+  return n;
+}
+function filledData() {
+  const n = keepSession(seed());
+  n.dates.forEach(d => {
+    (d.kind === 'off' ? [GROUP.lodging, GROUP.routing] : GROUPS).forEach(g => g.fields.forEach(f => {
+      if (!(d.v[f.id] || '').trim() && !(f.showOnly && d.kind === 'off')) d.v[f.id] = DUMMY[f.id];
+    }));
+    if (!d.confirmed) d.confirmed = {by:'Evan', when:'Nov 10'};
+  });
+  n.changes.forEach(c => { if (c.open) { c.open = false; c.done = 'Evan added it'; } });
+  ORDER.forEach(id => { n.seen[id] = n.changes.map(c => c.id); });
+  return n;
+}
+
+let S = load();
+let sheet = null;                    // {type:'group'|'blocked'|'share'|'people'|'send', dateId, groupId, from}
+let lastViewKey = '';
+let plotURL = null;                  // a real uploaded PDF lives only for this browser session
+
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.dates) && s.people && s.tour) return s; } catch (e) {}
+  return seed();
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- access ---------- */
+const me = () => S.people[S.role];
+const isBand = () => me().kind === 'band';
+const inScope = d => me().dates === 'all' || me().dates.includes(d.id);
+const canSee = gid => me().see.includes(gid);
+const canSeeField = f => canSee(f.group) && !me().hide.includes(f.id);
+const canEdit = gid => me().edit.includes(gid);
+/* Building the tour itself (adding, moving, removing dates) is its own permission. */
+const canPlan = () => !!(me().manage || me().canPlan);
+function tagOf(p) {
+  if (p.kind === 'guest') return p.tag + ' · view only';
+  if (p.manage) return 'Tour manager · full access';
+  return p.edit.length ? `Band · edits ${p.edit.length} of ${ALL.length} sections` : 'Band · view only';
+}
+function scopeText(p) {
+  if (p.dates === 'all') return 'Whole tour';
+  if (!p.dates.length) return 'No dates yet';
+  return S.dates.filter(d => p.dates.includes(d.id)).map(d => d.kind === 'off' ? 'Off day' : town(d)).join(', ');
+}
+
+/* ---------- model ---------- */
+const dateById = id => S.dates.find(d => d.id === id);
+const groupsFor = d => d.kind === 'off' ? [GROUP.extras, GROUP.lodging, GROUP.routing] : GROUPS;
+const fieldsFor = (d, g) => g.fields.filter(f => canSeeField(f) && !(f.showOnly && d.kind === 'off'));
+const val = (d, f) => (d.v[f] || '').trim();
+const evKey = (ev, f) => `ev-${ev.id}-${f.id}`;
+/* Every required detail that is still empty: {id, label, group}. */
+function missing(d) {
+  const out = [];
+  groupsFor(d).forEach(g => g.fields.forEach(f => { if (f.req && !val(d, f.id)) out.push({id:f.id, label:f.label, group:g.id}); }));
+  (d.events || []).forEach(ev => EVF.forEach(f => { if (f.req && !(ev[f.id] || '').trim()) out.push({id:evKey(ev, f), label:`${ev.name || 'New event'}: ${f.label.toLowerCase()}`, group:'extras'}); }));
+  return out;
+}
+/* Readiness is derived from what has been entered. Nobody sets it by hand. */
+function status(d) { return missing(d).length ? 'needs' : d.confirmed ? 'confirmed' : 'ready'; }
+function groupStat(d, g) {
+  if (g.id === 'extras') {
+    const evs = d.events || [], rq = EVF.filter(f => f.req);
+    return {req:evs.length * rq.length, reqIn:evs.reduce((n, ev) => n + rq.filter(f => (ev[f.id] || '').trim()).length, 0), opt:0, optIn:0, count:evs.length};
+  }
+  const fs = fieldsFor(d, g), req = fs.filter(f => f.req), opt = fs.filter(f => !f.req);
+  return {req:req.length, reqIn:req.filter(f => val(d, f.id)).length, opt:opt.length, optIn:opt.filter(f => val(d, f.id)).length};
+}
+const dateLabel = d => `${d.dow}, ${d.mon} ${d.day}`;
+const placeLabel = d => d.kind === 'off' ? 'Off day' : d.city;
+const town = d => d.city.split(',')[0];
+/* A tour date is a calendar day. Its weekday, day number and month are derived, and the tour stays in date order. */
+const DOWS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const isoParts = iso => { const t = new Date(iso + 'T12:00:00'); return {dow:DOWS[t.getDay()], day:t.getDate(), mon:MONS[t.getMonth()]}; };
+const isoLabel = iso => { const q = isoParts(iso); return `${q.dow}, ${q.mon} ${q.day}`; };
+const validISO = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') && !isNaN(new Date(v + 'T12:00:00'));
+function addDays(iso, n) { const t = new Date(iso + 'T12:00:00'); t.setDate(t.getDate() + n); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; }
+function hydrate() {
+  S.dates.forEach(d => Object.assign(d, isoParts(d.date)));
+  S.dates.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+}
+function rangeText() {
+  if (!S.dates.length) return 'No dates yet';
+  const a = S.dates[0], b = S.dates[S.dates.length - 1];
+  return a === b ? `${a.mon} ${a.day}` : a.mon === b.mon ? `${a.mon} ${a.day} to ${b.day}` : `${a.mon} ${a.day} to ${b.mon} ${b.day}`;
+}
+
+const tmin = v => { const m = /^(\d{1,2}):(\d{2})$/.exec(v || ''); return m ? +m[1] * 60 + +m[2] : null; };
+/* Anything before 5 AM belongs to the night before, so a midnight curfew sorts after the set. */
+const adj = m => m == null ? null : m < 300 ? m + 1440 : m;
+const now = () => adj(S.now);
+function fmtMin(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; const h = Math.floor(m / 60); return `${h % 12 || 12}:${pad(m % 60)} ${h < 12 ? 'AM' : 'PM'}`; }
+function dur(n) { n = Math.round(n); const h = Math.floor(n / 60), m = n % 60; return ((h ? h + ' h ' : '') + (m || !h ? m + ' min' : '')).trim(); }
+function fmt(f, v) {
+  if (!v) return '';
+  if (f.type === 'time') { const m = tmin(v); return m == null ? v : fmtMin(m); }
+  if (f.type === 'number') return f.dur ? dur(+v) : (f.pre || '') + v + (f.suf ? (f.suf === '%' ? '%' : ' ' + f.suf) : '');
+  if (f.type === 'date') { const t = new Date(v + 'T12:00:00'); return isNaN(t) ? v : t.toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
+  return v;
+}
+const show = (d, fid) => fmt(FIELD[fid], val(d, fid));
+/* Where the van is headed: usually the venue, sometimes the lodging first. */
+function dest(d) {
+  const nxt = S.dates[S.dates.indexOf(d) + 1];
+  if (d.kind === 'off') return val(d, 'lodgingPlace') || (nxt && nxt.kind === 'show' ? town(nxt) : 'the next stop');
+  return val(d, 'firstStop') === 'Lodging' ? (val(d, 'lodgingPlace') || 'lodging') : (val(d, 'venueName') || town(d));
+}
+const lodgingFirst = d => d.kind === 'show' && val(d, 'firstStop') === 'Lodging';
+const driveText = d => val(d, 'driveMin') ? `${dur(+val(d, 'driveMin'))} drive to ${dest(d)}` : '';
+
+/* The day's running order: schedule fields, the drive, and any other events, sorted by time. */
+function agenda(d) {
+  const A = []; let last = -1;
+  TIMELINE.forEach(fid => {
+    const f = FIELD[fid];
+    if (!canSeeField(f) || !groupsFor(d).some(g => g.id === f.group)) return;
+    const v = val(d, fid), m = adj(tmin(v));
+    if (!v && !f.req) return;
+    if (m != null) last = m;
+    A.push({key:fid, label:f.short, v:fmt(f, v), min:m, sort:m != null ? m : last + .1});
+    if (fid === 'departure' && +val(d, 'driveMin')) {
+      /* Van call is when everyone is at the van. Departure is when it pulls out; without one, the drive starts at van call. */
+      const dep = adj(tmin(val(d, 'wheelsUp'))) ?? m, n = +val(d, 'driveMin');
+      A.push({key:'drive', drive:true, label:'Drive to ' + dest(d), v:dep != null ? fmtMin(dep) : '', min:dep, end:dep != null ? dep + n : null,
+        took:dur(n), sub:dur(n) + (dep != null ? ' · arrive ' + fmtMin(dep + n) : ''), sort:(dep != null ? dep : last) + .05});
+      if (dep != null) last = Math.max(last, dep);
+    }
+  });
+  if (canSee('extras')) (d.events || []).forEach(ev => {
+    const m = adj(tmin(ev.start));
+    A.push({key:'ev-' + ev.id, ev, label:ev.name || 'New event', v:m != null ? fmtMin(m) : '', min:m, end:m != null ? m + (+ev.len || 60) : null, sub:[ev.type, ev.where].filter(Boolean).join(' · '), sort:m != null ? m : 9999});
+  });
+  return A.sort((a, b) => a.sort - b.sort);
+}
+/* Ranged events: if the clock falls inside one, it is in progress. */
+function phase(d) {
+  const A = agenda(d), g = k => A.find(x => x.key === k && x.min != null), n = now(), P = [];
+  const st = g('setTime'), dr = g('drive'), li = g('loadIn'), sc = g('soundcheck'), dz = g('doors');
+  if (st) P.push({key:'setTime', a:st.min, b:st.min + (+val(d, 'setLength') || 45), label:'On stage'});
+  A.filter(x => x.ev && x.min != null).forEach(x => P.push({key:x.key, a:x.min, b:x.end, label:x.label}));
+  if (dr) P.push({key:'drive', a:dr.min, b:dr.end, label:'On the road', end:'arriving'});
+  if (li) P.push({key:'loadIn', a:li.min, b:sc ? sc.min : li.min + 60, label:'Loading in'});
+  if (sc) P.push({key:'soundcheck', a:sc.min, b:Math.min(sc.min + 60, dz ? dz.min : Infinity), label:'Soundcheck'});
+  if (dz) P.push({key:'doors', a:dz.min, b:st ? st.min : dz.min + 60, label:'Doors open'});
+  return P.find(p => n >= p.a && n < p.b) || null;
+}
+const phaseText = p => `${p.label} · ${p.end || 'until'} ${fmtMin(p.b)}`;
+
+function logChange(c) {
+  c.id = 'c' + (S.nextId++); c.who = me().name; c.when = 'Today, ' + fmtMin(S.now);
+  S.changes.unshift(c);
+  if (!S.seen[S.role].includes(c.id)) S.seen[S.role].push(c.id);
+}
+const openReq = (dateId, key) => S.changes.find(c => c.kind === 'request' && c.open && c.dateId === dateId && c.field === key);
+function myChanges() {
+  return S.changes.filter(c => {
+    if (!c.dateId) return isBand();                     // tour-level entries, such as a removed date
+    const d = dateById(c.dateId);
+    return d && inScope(d) && (!c.group || (canSee(c.group) && !me().hide.includes(c.field))) && (c.kind !== 'request' || isBand());
+  });
+}
+const unseen = () => myChanges().filter(c => !S.seen[S.role].includes(c.id));
+
+/* ---------- icons ---------- */
+const I = {
+  chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M15 6l-6 6 6 6"/>',
+  pin:'<path d="M12 21s-6.5-5.6-6.5-10.5a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/>',
+  phone:'<path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 006 6l1.5-2 4 1.5v3a2 2 0 01-2 2A16 16 0 014.5 5.5a2 2 0 012-2z"/>',
+  wifi:'<path d="M3 9.5a13 13 0 0118 0M6.2 13a8.5 8.5 0 0111.6 0M9.3 16.3a4 4 0 015.4 0"/><circle cx="12" cy="19.2" r=".9" fill="currentColor"/>',
+  van:'<path d="M2.5 16.5v-9h11v9M13.5 10.5h4.2l3.8 3.5v2.5h-8"/><circle cx="7" cy="17" r="1.8"/><circle cx="17.5" cy="17" r="1.8"/>',
+  bed:'<path d="M3 18.5v-12M3 14.5h18v4M21 14.5V12a3 3 0 00-3-3h-7v5.5"/><circle cx="7" cy="11" r="1.6"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  share:'<path d="M12 15V4M8 7.5l4-4 4 4M5 12.5V19h14v-6.5"/>',
+  people:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0111 0M16 6a3 3 0 010 5.5M17.5 14a5 5 0 013.5 5"/>',
+  mic:'<rect x="9.5" y="3.5" width="5" height="10" rx="2.5"/><path d="M6.5 11.5a5.5 5.5 0 0011 0M12 17v3.5"/>',
+  cup:'<path d="M5 8.5h11v5a5.5 5.5 0 01-11 0zM16 9.5h2a2 2 0 010 5h-2M5 20.5h11"/>',
+  cash:'<rect x="3" y="6.5" width="18" height="11" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
+  building:'<path d="M5 20.5v-15h9v15M14 10.5h5v10M3 20.5h18M8 9h3M8 12.5h3M8 16h3"/>',
+  list:'<path d="M8.5 6.5h11M8.5 12h11M8.5 17.5h11"/><circle cx="4.8" cy="6.5" r="1" fill="currentColor"/><circle cx="4.8" cy="12" r="1" fill="currentColor"/><circle cx="4.8" cy="17.5" r="1" fill="currentColor"/>',
+  sun:'<circle cx="12" cy="12" r="3.5"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6L18 18M6 18l1.4-1.4M16.6 7.4L18 6"/>',
+  bell:'<path d="M6.5 16.5v-5a5.5 5.5 0 0111 0v5l1.5 2h-14zM10 20.5a2 2 0 004 0"/>',
+  askc:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.6a2.5 2.5 0 114.1 1.9c-.9.7-1.7 1.2-1.7 2.5"/><circle cx="12" cy="16.9" r=".9" fill="currentColor"/>',
+  msg:'<path d="M4.5 5.5h15v10.5h-8l-4 3.5V16h-3z"/>',
+  mail:'<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M4.2 7.5l7.8 6 7.8-6"/>',
+  copy:'<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M5.5 15.5v-9a2 2 0 012-2h8"/>',
+  cal:'<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+  edit:'<path d="M4.5 19.5l1-4L16 5l3 3L8.5 18.5zM14 7l3 3"/>',
+  flag:'<path d="M6 21V4.5h11.5l-2.5 4 2.5 4H6"/>',
+  file:'<path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4"/>',
+  plus:'<path d="M12 5.5v13M5.5 12h13"/>', minus:'<path d="M5.5 12h13"/>',
+  swap:'<path d="M4.5 8.5h14l-3.5-3.5M19.5 15.5h-14l3.5 3.5"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  undo:'<path d="M8 5.5l-4 4 4 4M4.5 9.5h9a5.5 5.5 0 010 11h-3"/>',
+  ask:'<path d="M9 9a3 3 0 115 2.2c-1 .8-2 1.5-2 3.1"/><circle cx="12" cy="18.3" r=".9" fill="currentColor"/>',
+  send:'<path d="M20.5 3.5l-17 7 6.5 3 3 6.5zM10 13.5l10.5-10"/>'
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+/* Status is carried by shape and words as well as color: disc, ring, diamond. */
+const GL = {
+  confirmed:'<circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M5.8 10.3l2.8 2.8 5.6-5.9" fill="none" stroke="var(--glyph-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  ready:'<circle cx="10" cy="10" r="7.8" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="10" cy="10" r="3.2" fill="currentColor"/>',
+  needs:'<path d="M10 1.2l8.8 8.8-8.8 8.8L1.2 10z" fill="currentColor"/><path d="M10 5.8v5" stroke="var(--glyph-ink)" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="13.8" r="1.25" fill="var(--glyph-ink)"/>'
+};
+const gl = s => `<svg class="gl" viewBox="0 0 20 20" aria-hidden="true">${GL[s]}</svg>`;
+function chip(d, long) {
+  const s = status(d), n = missing(d).length;
+  const t = s === 'confirmed' ? 'Confirmed' : s === 'ready' ? (long ? 'Ready to confirm' : 'Ready') : long ? `Needs info · ${n} missing` : `${n} missing`;
+  return `<span class="chip chip--${s}">${gl(s)}${t}</span>`;
+}
+
+/* ---------- views ---------- */
+function dateRow(d) {
+  const live = d.date === S.today ? phase(d) : null, n = canSee('extras') ? (d.events || []).length : 0;
+  const sub = (d.kind === 'off' ? (canSee('routing') && driveText(d) || 'Travel and rest') : (val(d, 'venueName') || 'Venue not entered')) + (n ? ` · +${n} event${n > 1 ? 's' : ''}` : '');
+  return `<button class="drow ${d.date === S.today ? 'is-today' : ''} ${d.kind === 'off' ? 'is-off' : ''}" data-action="open-date" data-date="${d.id}">
+      <span class="dd"><small>${d.dow}</small><b class="num">${d.day}</b></span>
+      <span class="dm"><b>${esc(placeLabel(d))}</b><small>${d.date === S.today ? `<em>${live ? esc(live.label) + ' now' : 'Today'}</em> · ` : ''}${esc(sub)}</small></span>
+      ${chip(d)}${ic('chev')}
+    </button>`;
+}
+function viewTour() {
+  const ds = S.dates.filter(inScope), c = {confirmed:0, ready:0, needs:0}, plan = canPlan(), t = S.tour;
+  ds.forEach(d => c[status(d)]++);
+  const kicker = isBand() ? [t.artist, rangeText()].filter(Boolean).join(' · ') : `Shared with you by ${t.artist || 'the band'}`;
+  const head = `<div class="headrow">
+      <div class="head"><p class="kicker">${esc(kicker)}</p><h1 class="title">${esc(t.name || 'Untitled tour')}</h1></div>
+      ${isBand() ? `<span class="headbtns">${plan ? `<button class="pill-btn icon-only" data-action="tour-edit" aria-label="Edit tour name and artist">${ic('edit')}</button>` : ''}<button class="pill-btn" data-action="people">${ic('people')}People</button></span>` : ''}
+    </div>`;
+  if (!S.dates.length) return `${head}
+    <div class="card emptycard"><b>No dates yet</b>
+      <p class="note">${plan ? 'Add the first date. Each one starts as a checklist of what a confirmed show needs.' : isBand() ? 'Nobody has added a date to this tour yet.' : 'No dates are shared with you yet.'}</p>
+      ${plan && !t.name ? `<button class="btn btn--line" data-action="tour-edit">${ic('edit')}Name the tour</button>` : ''}
+      ${plan ? `<button class="btn btn--primary" data-action="date-add">${ic('plus')}Add the first date</button>` : ''}
+    </div>`;
+  return `${head}
+    <div class="sum">
+      <div class="st--ok"><b class="num">${c.confirmed}</b><span class="gs--ok">${gl('confirmed')}Confirmed</span></div>
+      <div class="st--ready"><b class="num">${c.ready}</b><span style="color:var(--cyan)">${gl('ready')}Ready</span></div>
+      <div class="st--needs"><b class="num">${c.needs}</b><span class="gs--needs">${gl('needs')}Need info</span></div>
+    </div>
+    ${ds.length ? `<div class="list">${ds.map(dateRow).join('')}</div>` : '<p class="empty">No dates are shared with you yet.</p>'}
+    ${plan ? `<button class="btn btn--line" data-action="date-add">${ic('plus')}Add a date</button>` : ''}`;
+}
+/* The Today tab when today is not a tour date, or not one this viewer can see. */
+function viewNoToday(today) {
+  const ds = S.dates.filter(inScope), next = ds.find(d => d.date > S.today), plan = canPlan();
+  const title = today ? 'Nothing for you today' : !S.dates.length ? 'No dates yet' : 'Nothing on today';
+  const sub = !S.dates.length ? (plan ? 'Start by adding the first date of the tour.' : 'Nothing has been added to this tour yet.')
+    : next ? `Next up is ${dateLabel(next)}.` : ds.length ? 'Every date on the tour has passed.' : 'No dates are shared with you yet.';
+  return `<div class="head"><p class="kicker">${isoLabel(S.today)}${isBand() ? '' : ' · Shared with you by ' + esc(S.tour.artist || 'the band')}</p><h1 class="title">${title}</h1><p class="sub">${sub}</p></div>
+    ${!S.dates.length && plan ? `<button class="btn btn--primary" data-action="date-add">${ic('plus')}Add the first date</button>` : ''}
+    ${next ? `<div class="list">${dateRow(next)}</div>` : ds.length ? `<div class="list">${ds.map(dateRow).join('')}</div>` : ''}`;
+}
+
+function viewDate(d, onTodayTab) {
+  const i = S.dates.indexOf(d), isToday = d.date === S.today;
+  const mode = onTodayTab ? S.todayMode : S.route.mode;
+  const live = isToday ? phase(d) : null;
+  const sc = S.dates.filter(inScope), k = sc.indexOf(d);
+  const nav = (t, prev) => `<button class="navd" ${t ? `data-action="open-date" data-date="${t.id}" data-mode="${mode}" aria-label="${prev ? 'Previous' : 'Next'} day, ${dateLabel(t)}"` : 'disabled aria-hidden="true"'}>${prev ? ic('back') : ''}${t ? `${t.dow} ${t.day}` : (prev ? 'Start' : 'End')}${prev ? '' : ic('chev')}</button>`;
+  return `
+    <div class="navrow">${onTodayTab ? '<span></span>' : `<button class="backbtn" data-action="back">${ic('back')}Tour</button>`}<span class="navgrp">${nav(sc[k - 1], true)}${nav(sc[k + 1], false)}</span></div>
+    <div class="dayhead">
+      <div class="datetile ${isToday ? 'is-today' : ''}" aria-hidden="true"><span class="m">${d.mon}</span><b class="num">${d.day}</b><span class="w">${d.dow}</span></div>
+      <div class="head">
+        <p class="kicker"><span class="vh">${dateLabel(d)}. </span>Day ${i + 1} of ${S.dates.length}${isToday ? ' · <em>Today</em>' : ''}</p>
+        <h1 class="title">${esc(placeLabel(d))}</h1>
+        <p class="sub">${esc(d.kind === 'off' ? 'Travel and rest. No show.' : (val(d, 'venueName') || 'Venue not entered'))}</p>
+      </div>
+    </div>
+    <div class="chips">${chip(d, true)}${live ? `<span class="chip chip--live"><i class="pulse"></i>${esc(phaseText(live))}</span>` : ''}</div>
+    <div class="modes" role="group" aria-label="View">
+      <button data-action="mode" data-mode="sheet" aria-pressed="${mode === 'sheet'}">Day sheet</button>
+      <button data-action="mode" data-mode="advance" aria-pressed="${mode === 'advance'}">Advance</button>
+    </div>
+    ${mode === 'sheet' ? daySheet(d, isToday, live) : advance(d)}`;
+}
+
+const askLabel = text => `${ic('askc')}${text}`;
+function tile(d, fid, icon, label, action) {
+  const f = FIELD[fid], v = show(d, fid);
+  if (!v) {
+    const head = `<span class="th">${ic(icon)}${label}</span><span class="tv gap">Not entered</span>`;
+    if (canEdit(f.group)) return `<button class="tile is-gap" data-action="group" data-group="${f.group}" data-focus="${fid}" data-date="${d.id}">${head}<span class="ta">Add it</span></button>`;
+    if (isBand() && !openReq(d.id, fid)) return `<button class="tile is-gap" data-action="request" data-field="${fid}" data-date="${d.id}">${head}<span class="ta">${askLabel('Ask for it')}</span></button>`;
+    return `<div class="tile is-gap">${head}${isBand() ? '<span class="ta" style="color:var(--muted)">Asked</span>' : ''}</div>`;
+  }
+  return `<button class="tile" data-action="tile" data-kind="${action}" data-field="${fid}" data-date="${d.id}"><span class="th">${ic(icon)}${label}</span><span class="tv">${esc(v)}</span><span class="ta">${{map:'Open in Maps', call:'Call', copy:'Copy'}[action] || ''}</span></button>`;
+}
+/* The Contact tile keeps a fixed label like its neighbors; the name and number both sit in the body. */
+function contactTile(d) {
+  const name = val(d, 'dayContact'), ph = val(d, 'dayPhone');
+  if (!name && !ph) return tile(d, 'dayContact', 'phone', 'Contact', 'call');
+  const body = `<span class="th">${ic('phone')}Contact</span><span class="tv">${name ? esc(name) : '<span class="gap">No name</span>'}</span><span class="ts num">${ph ? esc(ph) : '<span class="gap">No phone</span>'}</span>`;
+  if (ph) return `<button class="tile" data-action="tile" data-kind="call" data-field="dayPhone" data-date="${d.id}">${body}<span class="ta">Call</span></button>`;
+  if (canEdit('contacts')) return `<button class="tile is-gap" data-action="group" data-group="contacts" data-focus="dayPhone" data-date="${d.id}">${body}<span class="ta">Add phone</span></button>`;
+  if (isBand() && !openReq(d.id, 'dayPhone')) return `<button class="tile is-gap" data-action="request" data-field="dayPhone" data-date="${d.id}">${body}<span class="ta">${askLabel('Ask for it')}</span></button>`;
+  return `<div class="tile is-gap">${body}${isBand() ? '<span class="ta" style="color:var(--muted)">Asked</span>' : ''}</div>`;
+}
+
+function daySheet(d, isToday, live) {
+  const m = missing(d), A = agenda(d), n = now();
+  const next = isToday ? A.find(x => x.min != null && x.min > n) : null;
+  const tl = A.map(x => {
+    const cls = live && live.key === x.key ? 'live' : next && x === next ? 'next-up' : isToday && x.min != null && (x.drive ? x.end : x.min) <= n ? 'past' : '';
+    const tag = cls === 'live' ? '<span class="tag">Now</span>' : cls === 'next-up' ? '<span class="tag">Next</span>' : '';
+    const time = x.v ? esc(x.v) : '<span class="gap">Not set</span>';
+    const name = `<span class="n">${esc(x.label)}${x.sub ? `<small>${esc(x.sub)}</small>` : ''}</span>`;
+    if (x.drive) return `<button class="tl-row drive ${cls}" data-action="route" data-date="${d.id}"><span class="t num">${time}</span>${name}${tag || `<span class="go">Route${ic('chev')}</span>`}</button>`;
+    return `<div class="tl-row ${cls}"><span class="t num">${time}</span>${name}${tag || '<span></span>'}</div>`;
+  }).join('');
+  const tiles = d.kind !== 'show' ? [] : [
+    canSeeField(FIELD.address) && tile(d, 'address', 'pin', 'Address', 'map'),
+    canSeeField(FIELD.dayPhone) && contactTile(d),
+    canSeeField(FIELD.parking) && tile(d, 'parking', 'van', 'Parking', ''),
+    canSeeField(FIELD.wifi) && tile(d, 'wifi', 'wifi', 'Wi-Fi', 'copy')].filter(Boolean);
+  const nd = S.dates[S.dates.indexOf(d) + 1], first = lodgingFirst(d);
+  const lodging = title => !canSee('lodging') ? '' : `<div class="card"><h3>${title}</h3>
+      ${val(d, 'lodgingPlace') ? `<div class="kv"><b>${esc(val(d, 'lodgingPlace'))}</b>${val(d, 'lodgingAddress') ? `<span>${esc(val(d, 'lodgingAddress'))}</span>` : ''}${val(d, 'checkInBy') ? `<span>Check in by ${esc(show(d, 'checkInBy'))}</span>` : ''}${val(d, 'lodgingNotes') ? `<span>${esc(val(d, 'lodgingNotes'))}</span>` : ''}</div>`
+        : `<div class="kv"><b class="gap">Not entered</b></div>`}
+    </div>`;
+  return `
+    ${isBand() && m.length ? `<button class="alert" data-action="blocked" data-date="${d.id}">${gl('needs')}<span>${m.length} required ${m.length === 1 ? 'detail is' : 'details are'} missing<small>See what is missing</small></span>${ic('chev')}</button>` : ''}
+    ${next ? `<div class="next"><span class="lbl">Next up</span><span class="big num">${esc(next.drive ? 'Depart' : next.label)} ${esc(next.v)}</span><span class="in">in ${dur(next.min - n)}${next.drive ? ' · ' + esc(next.label) : ''}</span></div>` : ''}
+    ${first ? lodging('First stop · lodging') : ''}
+    ${tiles.length ? `<div class="tiles">${tiles.join('')}</div>` : ''}
+    ${tl ? `<div class="card"><h3>Schedule</h3><div class="tl">${tl}</div></div>` : ''}
+    ${first ? '' : lodging("Tonight's lodging")}
+    ${d.kind === 'show' && canSee('production') && S.plot ? `<button class="card doc" data-action="plot-view"><span class="gi">${ic('file')}</span><span class="fmeta"><b>${esc(S.plot.name)}</b><small>Stage plot · ${esc(S.plot.size)}</small></span><span class="go">View</span></button>` : ''}
+    ${nd && inScope(nd) ? `<button class="card" style="width:100%" data-action="open-date" data-date="${nd.id}" data-mode="sheet"><h3>${nd.date === addDays(d.date, 1) ? 'Tomorrow' : 'Next date · ' + dateLabel(nd)}</h3><div class="kv"><b>${esc(placeLabel(nd))}${val(nd, 'venueName') ? ' · ' + esc(val(nd, 'venueName')) : ''}</b>${canSee('routing') ? `<span>${val(nd, 'departure') ? 'Van call ' + esc(show(nd, 'departure')) : 'Van call not set'}${driveText(nd) ? ' · ' + esc(driveText(nd)) : ''}</span>` : ''}</div></button>` : ''}
+    ${isBand() ? `<button class="btn btn--line" data-action="share" data-date="${d.id}">${ic('share')}Share day sheet</button>` : ''}`;
+}
+
+function advance(d) {
+  const gs = groupsFor(d).filter(g => canSee(g.id)), m = missing(d), s = status(d);
+  const total = groupsFor(d).reduce((n, g) => n + groupStat(d, g).req, 0), done = total - m.length;
+  const rows = gs.map(g => {
+    const st = groupStat(d, g), miss = st.req - st.reqIn, ex = g.id === 'extras';
+    const right = miss ? `<span class="gs gs--needs">${gl('needs')}${miss} missing</span>`
+      : st.req ? `<span class="gs gs--ok">${gl('confirmed')}Complete</span>`
+      : `<span class="gs gs--opt">${ex ? 'None' : `${st.optIn} of ${st.opt}`}</span>`;
+    const preview = ex ? (d.events || []).map(ev => ev.name || 'New event').join(' · ') : fieldsFor(d, g).filter(f => f.type !== 'url').map(f => show(d, f.id)).filter(Boolean).slice(0, 2).join(' · ');
+    return `<button class="grow" data-action="group" data-date="${d.id}" data-group="${g.id}"><span class="gi">${ic(g.icon)}</span><span class="gt"><b>${g.name}</b><small>${esc(preview || (ex ? 'Promos, in-stores, after-parties' : 'Nothing entered yet'))}</small></span>${right}${ic('chev')}</button>`;
+  }).join('');
+  const n = m.length, dets = n === 1 ? 'detail' : 'details';
+  /* One guided next step: the first required detail still missing, with the shortest route to closing it. */
+  let step = '';
+  if (isBand() && n) {
+    const x = m[0], where = `${GROUP[x.group].name} · ${n > 1 ? `${n - 1} more after this` : 'the last one'}`;
+    if (canEdit(x.group)) step = `<button class="nextstep" data-action="group" data-date="${d.id}" data-group="${x.group}" data-focus="${x.id}"><span class="ns"><small>Next to add</small><b>${esc(x.label)}</b><span>${where}</span></span>${ic('chev')}</button>`;
+    else if (!openReq(d.id, x.id)) step = `<button class="nextstep" data-action="request" data-date="${d.id}" data-field="${x.id}"><span class="ns"><small>Next to ask for</small><b>${askLabel(esc(x.label))}</b><span>${where}</span></span>${ic('chev')}</button>`;
+    else step = `<div class="nextstep"><span class="ns"><small>Waiting on</small><b>${esc(x.label)}</b><span>Asked · ${where}</span></span></div>`;
+  }
+  let foot;
+  if (s === 'confirmed') foot = `<div class="stamp">${gl('confirmed')}<span>Confirmed<small>By ${esc(d.confirmed.by)} · ${esc(d.confirmed.when)}</small></span></div>`;
+  else if (!isBand()) foot = `<div class="card"><b>Not confirmed yet</b><p class="note">${n ? `${n} required ${dets} still missing.` : 'Everything required is in.'}</p></div>`;
+  else if (s === 'ready') foot = me().confirm ? `<button class="btn btn--primary" data-action="confirm" data-date="${d.id}">Confirm this date</button>` : `<div class="card"><b>Everything required is in</b><p class="note">Waiting for the tour manager to confirm.</p></div>`;
+  else foot = me().confirm ? `<button class="btn btn--blocked" data-action="confirm" data-date="${d.id}">Confirm this date<small>${n} required ${dets} missing</small></button>`
+    : `<button class="btn btn--blocked" data-action="blocked" data-date="${d.id}">Not confirmed yet<small>See the ${n} missing ${dets}</small></button>`;
+  return `
+    ${isBand() ? `<div class="card prog"><h3>Required details</h3><p class="pg num"><b>${done}</b> of ${total} entered</p><div class="meter"><i style="width:${total ? Math.round(done / total * 100) : 100}%"></i></div>${step}</div>` : ''}
+    ${canPlan() ? `<div class="list"><button class="grow" data-action="date-edit" data-date="${d.id}"><span class="gi">${ic('cal')}</span><span class="gt"><b>Date and place</b><small>${esc(`${dateLabel(d)} · ${d.kind === 'off' ? 'Off day' : 'Show · ' + d.city}`)}</small></span><span class="gs gs--opt">Edit</span>${ic('chev')}</button></div>` : ''}
+    <div class="list">${rows}</div>
+    ${foot}`;
+}
+
+/* Changes lead with one of a fixed set of verbs, each with its own icon. */
+const VERB = {added:['Added','plus'], changed:['Changed','swap'], removed:['Removed','minus'], confirmed:['Confirmed','check'], withdrawn:['Unconfirmed','undo'], request:['Asked for','ask'], sent:['Sent','send']};
+function changeRow(c) {
+  const d = dateById(c.dateId), isNew = !S.seen[S.role].includes(c.id), [verb, icon] = VERB[c.kind];
+  const obj = c.kind === 'confirmed' || c.kind === 'withdrawn' ? placeLabel(d) : c.label;
+  const body = c.kind === 'changed' ? `<span class="diff num"><s>${esc(c.from)}</s> &rarr; <b>${esc(c.to)}</b></span>`
+    : c.kind === 'added' && c.to ? `<span class="diff"><b>${esc(c.to)}</b></span>`
+    : c.kind === 'removed' && c.from ? `<span class="diff"><s>${esc(c.from)}</s></span>`
+    : c.kind === 'sent' ? `<span class="diff">To ${esc(c.to)}</span>`
+    : c.kind === 'withdrawn' && !c.done ? `<span class="diff">${esc(c.note || c.label + ' is missing')}</span>` : '';
+  const tag = c.open ? '<span class="tagx tag--open">Open</span>' : c.done ? '<span class="tagx tag--done">Done</span>' : '';
+  return `<button class="chg ${isNew ? 'is-new' : ''} ${c.done ? 'is-done' : ''}" data-action="open-change" data-change="${c.id}"><span class="vb">${ic(icon)}</span><span class="cb"><span class="hl"><b>${verb}</b> ${esc(obj)}</span>${body}${c.done ? `<span class="res">${gl('confirmed')}${esc(c.done)}</span>` : ''}<small>${d ? esc(placeLabel(d)) + ', ' + dateLabel(d) : 'Tour'} · ${esc(c.who)} · ${esc(c.when)}${isNew ? ' · New' : ''}</small></span>${tag}</button>`;
+}
+function viewChanges() {
+  const all = myChanges(), open = all.filter(c => c.open), rest = all.filter(c => !c.open), n = unseen().length;
+  if (!all.length) return `<div class="head"><h1 class="title">Changes</h1></div><p class="empty">Nothing has changed yet.</p>`;
+  return `<div class="head"><p class="kicker">${n ? n + ' new since you last looked' : 'You are up to date'}</p><h1 class="title">Changes</h1></div>
+    ${open.length ? `<p class="sec">Needs attention</p><div class="list">${open.map(changeRow).join('')}</div>` : ''}
+    ${rest.length ? `<p class="sec">Activity</p><div class="list">${rest.map(changeRow).join('')}</div>` : ''}
+    ${n ? `<button class="btn btn--line" data-action="seen-all">Mark all as seen</button>` : ''}`;
+}
+
+/* ---------- sheets ---------- */
+function control(f, v, attrs) {
+  if (f.type === 'select') return `<select ${attrs}><option value="">Not set</option>${f.options.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  if (f.type === 'number') return `<div class="unit">${f.pre ? `<span>${f.pre}</span>` : ''}<input ${attrs} type="number" inputmode="numeric" min="0" step="1" value="${esc(v)}">${f.suf ? `<span>${f.suf}</span>` : ''}</div>`;
+  return `<input ${attrs} type="${f.type || 'text'}" value="${esc(v)}" autocomplete="off">`;
+}
+const reqTag = f => f.req ? '<span class="req">Required</span>' : '';
+const sheetHead = (title, sub, close, icon) => `<div class="sh-head">${icon ? `<span class="sh-ic">${icon}</span>` : ''}<div><h2 id="sheetTitle">${title}</h2><p id="sheetStat">${esc(sub)}</p></div><button class="sh-x" data-action="close-sheet">${close}</button></div>`;
+function groupLine(d, g) {
+  const st = groupStat(d, g);
+  return `${st.req ? `${st.reqIn} of ${st.req} required entered` : 'Nothing required'} · ${placeLabel(d)}, ${dateLabel(d)}`;
+}
+
+function plotBox(d) {
+  const can = canEdit('production'), p = S.plot, sent = show(d, 'plotSent');
+  const upload = label => `<label class="sbtn ${p ? '' : 'sbtn--pri'}">${label}<input class="vh" type="file" id="plotFile" accept="application/pdf,.pdf"></label>`;
+  if (!p) return `<div class="box"><div class="file"><span class="gi">${ic('file')}</span><span class="fmeta"><b>Stage plot</b><small>No PDF uploaded yet</small></span></div>${can ? `<div class="frow">${upload('Upload PDF')}</div>` : ''}</div>`;
+  return `<div class="box"><div class="file"><span class="gi">${ic('file')}</span><span class="fmeta"><b>${esc(p.name)}</b><small>Stage plot · ${esc(p.size)} · used for every date</small></span></div>
+    <div class="frow"><button class="sbtn" data-action="plot-view">View</button>${can ? `<button class="sbtn sbtn--pri" data-action="plot-send" data-date="${d.id}">${ic('send')}${sent ? 'Send again' : 'Send to venue'}</button>${upload('Replace')}` : ''}</div>
+    <small class="note">${sent ? `Sent to this venue on ${esc(sent)}` : 'Not sent to this venue yet'}</small></div>`;
+}
+function sheetGroup(d, g) {
+  const can = canEdit(g.id), fs = fieldsFor(d, g);
+  const row = f => {
+    const v = val(d, f.id), miss = f.req && !v;
+    if (can) return `<div class="fld ${miss ? 'is-missing' : ''}" data-fld="${f.id}"><label for="in-${f.id}">${esc(f.label)}</label>${control(f, v, `id="in-${f.id}" data-input="${f.id}"`)}</div>`;
+    const ask = v || !isBand() ? '' : openReq(d.id, f.id) ? '<span class="asked">Asked. Waiting for an answer.</span>' : `<button class="ask" data-action="request" data-date="${d.id}" data-field="${f.id}">${askLabel('Ask for this')}</button>`;
+    return `<div class="fld ${miss ? 'is-missing' : ''}"><span class="fl">${esc(f.label)}</span><span class="val">${v ? esc(fmt(f, v)) : '<span class="gap">Not entered</span>'}</span>${ask}</div>`;
+  };
+  /* Required and optional are separate lists, so the split reads once instead of on every field. */
+  const rq = fs.filter(f => f.req), op = fs.filter(f => !f.req);
+  const body = (rq.length ? `<p class="sec">Required</p>${rq.map(row).join('')}` : '') + (op.length ? `<p class="sec">Optional</p>${op.map(row).join('')}` : '');
+  return `${sheetHead(g.name, groupLine(d, g), can ? 'Done' : 'Close')}
+    <div class="sh-body">${g.id === 'production' ? plotBox(d) : ''}${body}</div>`;
+}
+function sheetExtras(d) {
+  const can = canEdit('extras'), evs = d.events || [], miss = new Set(missing(d).map(m => m.id));
+  const cards = evs.map(ev => {
+    if (!can) return `<div class="box"><div class="box-h"><b>${esc(ev.name || 'New event')}</b></div><span class="note">${[ev.type, ev.start && fmtMin(tmin(ev.start)), ev.len && ev.len + ' min', ev.where].filter(Boolean).map(esc).join(' · ') || 'No details yet'}</span></div>`;
+    return `<div class="box"><div class="box-h"><b data-evt="${ev.id}">${esc(ev.name || 'New event')}</b><button class="linkbtn" data-action="ev-remove" data-date="${d.id}" data-ev="${ev.id}">Remove</button></div>
+      ${EVF.map(f => { const k = evKey(ev, f); return `<div class="fld ${miss.has(k) ? 'is-missing' : ''}" data-fld="${k}"><label for="in-${k}">${f.label}${reqTag(f)}</label>${control(f, ev[f.id] || '', `id="in-${k}" data-ev="${ev.id}" data-evf="${f.id}"`)}</div>`; }).join('')}</div>`;
+  }).join('');
+  return `${sheetHead('Other events', groupLine(d, GROUP.extras), can ? 'Done' : 'Close')}
+    <div class="sh-body">${cards || '<p class="empty">Nothing else is planned for this day.</p>'}${can ? `<button class="btn btn--line" data-action="ev-add" data-date="${d.id}">${ic('plus')}Add an event</button>` : ''}</div>`;
+}
+
+function sheetBlocked(d) {
+  const m = missing(d);
+  const rows = m.map(x => {
+    const act = canEdit(x.group) ? `<button data-action="group" data-date="${d.id}" data-group="${x.group}" data-focus="${x.id}" data-from="blocked">Fix</button>`
+      : openReq(d.id, x.id) ? '<span class="asked">Asked</span>'
+      : `<button data-action="request" data-date="${d.id}" data-field="${x.id}">${askLabel('Ask')}</button>`;
+    return `<div class="blk"><div><b>${esc(x.label)}</b><small>${GROUP[x.group].name}</small></div>${act}</div>`;
+  }).join('');
+  return `${sheetHead(`${d.kind === 'off' ? 'This day' : 'This date'} can't be confirmed yet`, `${m.length} required ${m.length === 1 ? 'detail is' : 'details are'} still missing.`, 'Close', gl('needs'))}
+    <div class="sh-body">${rows}</div>`;
+}
+
+function sheetText(d) {
+  const s = status(d), m = missing(d), L = [];
+  const add = (label, f) => { if (val(d, f)) L.push(`${label}: ${show(d, f)}`); };
+  L.push(`DAY SHEET · ${dateLabel(d)} · ${placeLabel(d)}`);
+  if (d.kind === 'show') { add('Venue', 'venueName'); add('Address', 'address'); add('Parking', 'parking'); }
+  L.push('');
+  agenda(d).forEach(x => { if (x.v) L.push(x.drive ? `${x.v.padEnd(9)} ${x.label} (${x.took})` : `${x.v.padEnd(9)} ${x.label}${x.ev && x.ev.where ? ' @ ' + x.ev.where : ''}`); });
+  L.push('');
+  if (val(d, 'dayContact')) L.push(`Contact: ${val(d, 'dayContact')} ${val(d, 'dayPhone')}`);
+  add('Wi-Fi', 'wifi'); add('Lodging', 'lodgingPlace'); add('Lodging address', 'lodgingAddress'); add('Check in by', 'checkInBy'); add('Meals', 'meals'); add('Guest list', 'guestList');
+  L.push('');
+  L.push(s === 'confirmed' ? `Status: Confirmed by ${d.confirmed.by}` : s === 'ready' ? 'Status: Ready, not yet confirmed' : `Status: NOT CONFIRMED. Missing: ${m.map(x => x.label).join(', ')}`);
+  return L.join('\n').replace(/\n{3,}/g, '\n\n');
+}
+function sheetShare(d) {
+  return `${sheetHead('Share day sheet', `${placeLabel(d)}, ${dateLabel(d)}`, 'Close')}
+    <div class="sh-body">
+      ${status(d) !== 'confirmed' ? `<div class="alert">${gl('needs')}<span>This date is not confirmed<small>The sheet says so.</small></span></div>` : ''}
+      <div class="paper"><pre class="out" id="shareOut">${esc(sheetText(d))}</pre></div>
+    </div>
+    <div class="sh-foot"><div class="targets">
+      <button class="target" data-action="send-share" data-via="text message"><span class="tg tg--msg">${ic('msg')}</span>Message</button>
+      <button class="target" data-action="send-share" data-via="email"><span class="tg tg--mail">${ic('mail')}</span>Email</button>
+      <button class="target" data-action="copy-share"><span class="tg tg--copy">${ic('copy')}</span>Copy text</button>
+    </div></div>`;
+}
+function sheetSend(d) {
+  const name = val(d, 'dayContact'), ph = val(d, 'dayPhone'), em = val(d, 'dayEmail');
+  const ok = (sheet.sms && ph) || (sheet.email && em);
+  return `${sheetHead('Send stage plot', `${S.plot.name} · ${placeLabel(d)}, ${dateLabel(d)}`, 'Cancel')}
+    <div class="sh-body">
+      <div class="box"><div class="ph"><span class="av">${esc((name || '?')[0])}</span><span><b>${esc(name || 'No day-of contact yet')}</b><small>Day-of contact · ${esc(val(d, 'venueName'))}</small></span></div>
+        <div class="pchips">
+          <button class="pchip" data-action="send-via" data-via="sms" aria-pressed="${!!(sheet.sms && ph)}" ${ph ? '' : 'disabled'}>Text ${esc(ph || '· no phone entered')}</button>
+          <button class="pchip" data-action="send-via" data-via="email" aria-pressed="${!!(sheet.email && em)}" ${em ? '' : 'disabled'}>Email ${esc(em || '· no email entered')}</button>
+        </div></div>
+    </div>
+    <div class="sh-foot"><button class="btn btn--primary" data-action="plot-send-go" ${ok ? '' : 'disabled'}>${ic('send')}Send</button></div>`;
+}
+
+function sheetPeople() {
+  const manage = !!me().manage;
+  const card = id => {
+    const p = S.people[id];
+    let body;
+    if (p.kind === 'guest') body = `<p class="note">Sees ${p.see.map(g => GROUP[g].name).join(', ')}. ${manage ? 'Tap a date to share it.' : 'Shared dates are highlighted.'}</p>
+      <div class="pchips"><button class="pchip" ${manage ? `data-action="pall" data-person="${id}"` : 'disabled'} aria-pressed="${p.dates === 'all'}">Whole tour</button>${S.dates.map(d => `<button class="pchip" ${manage ? `data-action="pdate" data-person="${id}" data-date="${d.id}"` : 'disabled'} aria-pressed="${p.dates === 'all' || p.dates.includes(d.id)}">${d.mon} ${d.day} · ${d.kind === 'off' ? 'Off' : esc(town(d))}</button>`).join('')}</div>`;
+    else if (p.manage) body = '<p class="note">Edits every section and confirms dates.</p>';
+    else body = `<p class="note">Sees everything. ${manage ? 'Tap a section to let ' + esc(p.name) + ' edit it.' : 'Can edit the highlighted sections.'}</p>
+      <div class="pchips"><button class="pchip" ${manage ? `data-action="plan" data-person="${id}"` : 'disabled'} aria-pressed="${!!p.canPlan}">Tour dates</button>${GROUPS.map(g => `<button class="pchip" ${manage ? `data-action="perm" data-person="${id}" data-group="${g.id}"` : 'disabled'} aria-pressed="${p.edit.includes(g.id)}">${g.name}</button>`).join('')}</div>`;
+    return `<div class="box"><div class="ph"><span class="av">${p.name[0]}</span><span><b>${esc(p.name)}${id === S.role ? ' (you)' : ''}</b><small>${esc(tagOf(p))}${p.kind === 'guest' ? ' · ' + esc(scopeText(p)) : ''}</small></span></div>${body}</div>`;
+  };
+  return `${sheetHead('People', 'Who can see and change this tour', 'Done')}
+    <div class="sh-body"><p class="sec">Band</p>${ORDER.filter(id => S.people[id].kind === 'band').map(card).join('')}<p class="sec">Shared, view only</p>${ORDER.filter(id => S.people[id].kind === 'guest').map(card).join('')}</div>`;
+}
+
+/* Add or edit a tour date: the calendar day, whether it is a show, and where. */
+function openDateForm(d) {
+  const last = S.dates[S.dates.length - 1];
+  sheet = d ? {type:'dateform', dateId:d.id, draft:{date:d.date, kind:d.kind, city:d.kind === 'off' ? '' : d.city, venue:''}, err:{}}
+            : {type:'dateform', draft:{date:last ? addDays(last.date, 1) : S.today, kind:'show', city:'', venue:''}, err:{}};
+}
+function sheetDateForm() {
+  const f = sheet.draft, e = sheet.err, d = sheet.dateId ? dateById(sheet.dateId) : null, show = f.kind === 'show';
+  const n = d ? Object.values(d.v).filter(x => (x || '').trim()).length + (d.events || []).length : 0;
+  const sub = d ? `${dateLabel(d)} · ${placeLabel(d)}` : S.dates.length ? `${S.dates.length} date${S.dates.length === 1 ? '' : 's'} on the tour so far` : 'The first date on this tour';
+  return `${sheetHead(d ? 'Date and place' : 'Add a date', sub, 'Cancel')}
+    <div class="sh-body">
+      <div class="fld ${e.date ? 'is-bad' : ''}"><label for="in-df-date">Date<span class="req">Required</span></label><input id="in-df-date" data-df="date" type="date" value="${esc(f.date)}">${e.date ? `<span class="errmsg">${esc(e.date)}</span>` : ''}</div>
+      <div class="fld"><span class="fl">Type</span><div class="modes" role="group" aria-label="Type">
+        <button data-action="df-kind" data-kind="show" aria-pressed="${show}">Show</button>
+        <button data-action="df-kind" data-kind="off" aria-pressed="${!show}">Off day</button></div></div>
+      ${show ? `<div class="fld ${e.city ? 'is-bad' : ''}"><label for="in-df-city">City<span class="req">Required</span></label><input id="in-df-city" data-df="city" type="text" value="${esc(f.city)}" placeholder="City, ST" autocomplete="off">${e.city ? `<span class="errmsg">${esc(e.city)}</span>` : ''}</div>
+        ${d ? '' : `<div class="fld"><label for="in-df-venue">Venue name</label><input id="in-df-venue" data-df="venue" type="text" value="${esc(f.venue)}" autocomplete="off"></div>`}`
+        : `<p class="note">An off day has no show. It still needs lodging and a van call.</p>`}
+      ${d && d.kind === 'show' && !show ? `<p class="note">Venue, schedule and deal details are kept, but hidden while this is an off day.</p>` : ''}
+      ${d && d.confirmed ? `<p class="note">This date is confirmed. Moving it or changing its type withdraws the confirmation.</p>` : ''}
+      ${!d ? '' : sheet.confirmRemove ? `<div class="box box--bad"><b>Remove ${dateLabel(d)}?</b><span class="note">${n ? `The ${n} detail${n === 1 ? '' : 's'} entered for it will be deleted.` : 'Nothing has been entered for it yet.'} This can't be undone.</span>
+          <div class="frow"><button class="sbtn sbtn--bad" data-action="df-remove-go">Remove date</button><button class="sbtn" data-action="df-remove-cancel">Keep it</button></div></div>`
+        : `<button class="linkbtn danger" data-action="df-remove">Remove this date</button>`}
+    </div>
+    <div class="sh-foot">${d ? `<button class="btn btn--primary" data-action="df-save">Save changes</button>`
+      : `<button class="btn btn--primary" data-action="df-save">Add date</button><button class="btn btn--line" data-action="df-save" data-again="1">Add and start another</button>`}</div>`;
+}
+function sheetTourForm() {
+  const f = sheet.draft, e = sheet.err;
+  return `${sheetHead('Tour details', 'Shown to everyone the tour is shared with', 'Cancel')}
+    <div class="sh-body">
+      <div class="fld ${e.name ? 'is-bad' : ''}"><label for="in-df-name">Tour name<span class="req">Required</span></label><input id="in-df-name" data-df="name" type="text" value="${esc(f.name)}" autocomplete="off">${e.name ? `<span class="errmsg">${esc(e.name)}</span>` : ''}</div>
+      <div class="fld"><label for="in-df-artist">Artist or band</label><input id="in-df-artist" data-df="artist" type="text" value="${esc(f.artist)}" autocomplete="off"></div>
+    </div>
+    <div class="sh-foot"><button class="btn btn--primary" data-action="tf-save">Save</button></div>`;
+}
+
+/* ---------- render ---------- */
+function render() {
+  hydrate();
+  const view = $('view'), today = S.dates.find(d => d.date === S.today) || null;
+  if (S.route && (!dateById(S.route.dateId) || !inScope(dateById(S.route.dateId)))) S.route = null;
+  let html, key;
+  if (S.tab === 'today') { html = today && inScope(today) ? viewDate(today, true) : viewNoToday(today); key = 'today:' + S.today + S.todayMode; }
+  else if (S.tab === 'tour' && S.route) { html = viewDate(dateById(S.route.dateId), false); key = 'date:' + S.route.dateId + S.route.mode; }
+  else if (S.tab === 'tour') { html = viewTour(); key = 'tour'; }
+  else { html = viewChanges(); key = 'changes'; }
+  key += S.role;
+  const keep = key === lastViewKey ? view.scrollTop : 0;
+  view.innerHTML = html; view.scrollTop = keep; lastViewKey = key;
+
+  const n = unseen().length;
+  $('tabs').innerHTML = [['today','sun','Today'],['tour','list','Tour'],['changes','bell','Changes']].map(([id, icn, lbl]) =>
+    `<button class="tab" data-action="tab" data-tab="${id}" ${S.tab === id ? 'aria-current="page"' : ''}>${ic(icn)}${lbl}${id === 'changes' && n ? `<span class="badge num">${n}</span>` : ''}</button>`).join('');
+
+  const roleBtn = id => { const p = S.people[id]; return `<button class="role" data-action="role" data-role="${id}" aria-pressed="${S.role === id}"><span class="av">${p.name[0]}</span><span><b>${p.name}</b><small>${esc(tagOf(p))}</small></span></button>`; };
+  $('roles').innerHTML = '<h3>Band</h3>' + ORDER.filter(id => S.people[id].kind === 'band').map(roleBtn).join('') + '<h3>Shared a link</h3>' + ORDER.filter(id => S.people[id].kind === 'guest').map(roleBtn).join('');
+  $('swOff').setAttribute('aria-checked', S.offline);
+  $('offlineBar').hidden = !S.offline;
+  $('net').textContent = S.offline ? 'No service' : 'LTE';
+  $('clock').textContent = fmtMin(S.now);
+  { const w = $('who'), q = me(); w.innerHTML = `<span class="av">${q.name[0]}</span>${esc(q.name)}`; w.disabled = !isBand(); if (isBand()) w.dataset.action = 'people'; else delete w.dataset.action; w.setAttribute('aria-label', `Viewing as ${q.name}${isBand() ? '. Open People' : ''}`); }
+  if (document.activeElement !== $('todayIn')) $('todayIn').value = S.today;
+  { const c = S.dates.filter(d => status(d) === 'confirmed').length; $('dataNote').textContent = `${c} of ${S.dates.length} dates confirmed`; }
+  if (document.activeElement !== $('nowIn')) $('nowIn').value = `${pad(Math.floor(S.now / 60))}:${pad(S.now % 60)}`;
+  document.querySelectorAll('#themeSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeVal === S.theme));
+  if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', S.theme);
+  save();
+}
+function renderSheet(focus) {
+  const el = $('sheet');
+  if (!sheet) { el.hidden = true; $('scrim').hidden = true; return; }
+  const d = sheet.dateId && dateById(sheet.dateId), keep = el.querySelector('.sh-body') ? el.querySelector('.sh-body').scrollTop : 0, same = el.dataset.k === sheet.type + (sheet.groupId || '');
+  el.innerHTML = sheet.type === 'group' ? (sheet.groupId === 'extras' ? sheetExtras(d) : sheetGroup(d, GROUP[sheet.groupId]))
+    : sheet.type === 'blocked' ? sheetBlocked(d) : sheet.type === 'dateform' ? sheetDateForm() : sheet.type === 'tourform' ? sheetTourForm() : sheet.type === 'people' ? sheetPeople() : sheet.type === 'send' ? sheetSend(d) : sheetShare(d);
+  el.dataset.k = sheet.type + (sheet.groupId || '');
+  el.hidden = false; $('scrim').hidden = false;
+  if (same && !focus) { el.querySelector('.sh-body').scrollTop = keep; return; }
+  const target = (focus && $('in-' + focus)) || el.querySelector('.sh-x');
+  if (target) target.focus();
+}
+function refreshGroupSheet() {
+  if (!sheet || sheet.type !== 'group') return;
+  const d = dateById(sheet.dateId), miss = new Set(missing(d).map(m => m.id));
+  $('sheet').querySelectorAll('[data-fld]').forEach(row => row.classList.toggle('is-missing', miss.has(row.dataset.fld)));
+  $('sheet').querySelectorAll('[data-evt]').forEach(b => { const ev = (d.events || []).find(e => e.id === b.dataset.evt); if (ev) b.textContent = ev.name || 'New event'; });
+  const st = $('sheetStat'); if (st) st.textContent = groupLine(d, GROUP[sheet.groupId]);
+}
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+
+/* ---------- actions ---------- */
+/* After any edit: withdraw a confirmation that no longer holds, and say what happened. */
+function settle(d, wasConfirmed, wasMissing, label, req) {
+  const nowMissing = missing(d).length;
+  if (wasConfirmed && nowMissing) {
+    d.confirmed = null;
+    logChange({dateId:d.id, kind:'withdrawn', label, open:true});
+    toast('A required detail is missing. Confirmation withdrawn.');
+  } else if (wasMissing && !nowMissing) toast('Everything required is in. Ready to confirm.');
+  else toast(S.offline ? 'Saved on this phone. It will sync later.' : req ? `Saved. ${req.who}'s request is done.` : 'Saved');
+}
+function answer(d, key) { const r = openReq(d.id, key); if (r) { r.open = false; r.done = `${me().name} added it`; } return r; }
+function setField(d, fid, raw) {
+  const f = FIELD[fid], next = raw.trim(), prev = val(d, fid);
+  if (next === prev) return;
+  const wasConfirmed = !!d.confirmed, wasMissing = missing(d).length, from = fmt(f, prev);
+  d.v[fid] = next;
+  logChange({dateId:d.id, group:f.group, field:fid, kind: !prev ? 'added' : !next ? 'removed' : 'changed', label:f.label, from, to:fmt(f, next)});
+  settle(d, wasConfirmed, wasMissing, f.label, next && answer(d, fid));
+  render(); refreshGroupSheet();
+}
+function setEvent(d, evId, fid, raw) {
+  const ev = d.events.find(e => e.id === evId), f = EVF.find(x => x.id === fid), next = raw.trim(), prev = (ev[fid] || '').trim();
+  if (next === prev) return;
+  const wasConfirmed = !!d.confirmed, wasMissing = missing(d).length, from = fmt(f, prev);
+  ev[fid] = next;
+  const label = fid === 'name' ? 'Event' : `${ev.name || 'Event'}: ${f.label.toLowerCase()}`;
+  logChange({dateId:d.id, group:'extras', field:evKey(ev, f), kind: !prev ? 'added' : !next ? 'removed' : 'changed', label, from, to:fmt(f, next)});
+  settle(d, wasConfirmed, wasMissing, label, next && answer(d, evKey(ev, f)));
+  render(); refreshGroupSheet();
+}
+function closeSheet() {
+  const was = sheet; sheet = null;
+  if (was && was.type === 'group' && was.from === 'blocked' && missing(dateById(was.dateId)).length) sheet = {type:'blocked', dateId:was.dateId};
+  if (was && was.type === 'send') sheet = {type:'group', dateId:was.dateId, groupId:'production'};
+  renderSheet();
+}
+function goDate(d, mode) {
+  S.tab = 'tour'; S.route = {dateId:d.id, mode: mode || (me().edit.length && status(d) !== 'confirmed' ? 'advance' : 'sheet')};
+  lastViewKey = '';
+}
+const ACT = {
+  tab(ds) { S.tab = ds.tab; S.route = null; },
+  'open-date'(ds) { goDate(dateById(ds.date), ds.mode); },
+  'open-change'(ds) {
+    const c = S.changes.find(x => x.id === ds.change), d = dateById(c.dateId);
+    if (!S.seen[S.role].includes(c.id)) S.seen[S.role].push(c.id);
+    if (!d) { S.tab = 'tour'; S.route = null; render(); return false; }
+    goDate(d, c.open ? 'advance' : 'sheet'); render();
+    if (c.open && c.kind === 'request' && canEdit(c.group)) { sheet = {type:'group', dateId:d.id, groupId:c.group}; renderSheet(c.field); }
+    return false;
+  },
+  back() { S.route = null; },
+  mode(ds) { if (S.tab === 'today') S.todayMode = ds.mode; else S.route.mode = ds.mode; },
+  group(ds) { sheet = {type:'group', dateId:ds.date, groupId:ds.group, from:ds.from}; renderSheet(ds.focus); return false; },
+  blocked(ds) { sheet = {type:'blocked', dateId:ds.date}; renderSheet(); return false; },
+  share(ds) { sheet = {type:'share', dateId:ds.date}; renderSheet(); return false; },
+  people() { sheet = {type:'people'}; renderSheet(); return false; },
+  perm(ds) {
+    const e = S.people[ds.person].edit, i = e.indexOf(ds.group);
+    if (i < 0) e.push(ds.group); else e.splice(i, 1);
+    render(); renderSheet(); return false;
+  },
+  pdate(ds) {
+    const p = S.people[ds.person];
+    if (p.dates === 'all') p.dates = S.dates.map(d => d.id);
+    const i = p.dates.indexOf(ds.date);
+    if (i < 0) p.dates.push(ds.date); else p.dates.splice(i, 1);
+    render(); renderSheet(); return false;
+  },
+  pall(ds) { const p = S.people[ds.person]; p.dates = p.dates === 'all' ? [] : 'all'; render(); renderSheet(); return false; },
+  plan(ds) { const p = S.people[ds.person]; p.canPlan = !p.canPlan; render(); renderSheet(); return false; },
+  'tour-edit'() { sheet = {type:'tourform', draft:{name:S.tour.name, artist:S.tour.artist}, err:{}}; renderSheet('df-name'); return false; },
+  'tf-save'() {
+    const name = (sheet.draft.name || '').trim(), artist = (sheet.draft.artist || '').trim();
+    if (!name) { sheet.err = {name:'Give the tour a name.'}; renderSheet('df-name'); return false; }
+    if (name !== S.tour.name) logChange({dateId:null, kind:S.tour.name ? 'changed' : 'added', label:'Tour name', from:S.tour.name, to:name});
+    if (artist !== S.tour.artist && artist) logChange({dateId:null, kind:S.tour.artist ? 'changed' : 'added', label:'Artist', from:S.tour.artist, to:artist});
+    S.tour = {name, artist}; sheet = null; renderSheet(); render(); toast('Saved'); return false;
+  },
+  'date-add'() { openDateForm(); renderSheet('df-date'); return false; },
+  'date-edit'(ds) { openDateForm(dateById(ds.date)); renderSheet(); return false; },
+  'df-kind'(ds) { sheet.draft.kind = ds.kind; sheet.err = {}; renderSheet(); return false; },
+  'df-remove'() { sheet.confirmRemove = true; renderSheet(); $('sheet').querySelector('.sh-body').scrollTop = 1e6; return false; },
+  'df-remove-cancel'() { sheet.confirmRemove = false; renderSheet(); return false; },
+  'df-remove-go'() {
+    const d = dateById(sheet.dateId), what = `${dateLabel(d)} · ${placeLabel(d)}`;
+    S.dates.splice(S.dates.indexOf(d), 1);
+    S.changes = S.changes.filter(c => c.dateId !== d.id);
+    ORDER.forEach(id => { const q = S.people[id]; if (Array.isArray(q.dates)) q.dates = q.dates.filter(x => x !== d.id); });
+    logChange({dateId:null, kind:'removed', label:'Date', from:what});
+    sheet = null; S.route = null; S.tab = 'tour'; renderSheet(); render(); toast(`Removed ${what}`); return false;
+  },
+  'df-save'(ds) {
+    const f = sheet.draft, d = sheet.dateId ? dateById(sheet.dateId) : null, err = {};
+    f.city = (f.city || '').trim(); f.venue = (f.venue || '').trim();
+    if (!validISO(f.date)) err.date = 'Pick a date.';
+    else if (S.dates.some(x => x.date === f.date && x !== d)) err.date = `${isoLabel(f.date)} is already on the tour. Add a second stop that day under Other events.`;
+    if (f.kind === 'show' && !f.city) err.city = 'Enter the city.';
+    if (err.date || err.city) { sheet.err = err; renderSheet(err.date ? 'df-date' : 'df-city'); return false; }
+    const city = f.kind === 'off' ? 'Off day' : f.city;
+    if (!d) {
+      const nd = {id:'d' + (S.nextId++), date:f.date, kind:f.kind, city, confirmed:null, events:[], v:f.kind === 'show' && f.venue ? {venueName:f.venue} : {}};
+      S.dates.push(nd); hydrate();
+      logChange({dateId:nd.id, kind:'added', label:'Date', to:`${dateLabel(nd)} · ${placeLabel(nd)}`});
+      S.tab = 'tour'; S.route = null;
+      if (ds.again) { sheet.draft = {date:addDays(f.date, 1), kind:'show', city:'', venue:''}; sheet.err = {}; render(); renderSheet('df-city'); toast(`Added ${dateLabel(nd)}. Now the next one.`); return false; }
+      sheet = null; renderSheet(); render(); toast(`Added ${dateLabel(nd)}`); return false;
+    }
+    const moved = d.date !== f.date, retyped = d.kind !== f.kind, recity = !retyped && d.city !== city, wasConfirmed = !!d.confirmed;
+    const before = dateLabel(d), oldCity = d.city, kindName = k => k === 'off' ? 'Off day' : 'Show';
+    if (moved || retyped || recity) {
+      const oldKind = d.kind; d.date = f.date; d.kind = f.kind; d.city = city; hydrate();
+      if (moved) logChange({dateId:d.id, kind:'changed', label:'Date', from:before, to:dateLabel(d)});
+      if (retyped) logChange({dateId:d.id, kind:'changed', label:'Type', from:kindName(oldKind), to:kindName(d.kind) + (d.kind === 'show' ? ' · ' + city : '')});
+      if (recity) logChange({dateId:d.id, kind:'changed', label:'City', from:oldCity, to:city});
+      if ((moved || retyped) && wasConfirmed) { d.confirmed = null; logChange({dateId:d.id, kind:'withdrawn', label:'Date', note:'The date or its type changed', open:true}); }
+    }
+    sheet = null; lastViewKey = ''; renderSheet(); render();
+    toast((moved || retyped) && wasConfirmed ? 'Saved. Confirmation withdrawn.' : 'Saved'); return false;
+  },
+  'ev-add'(ds) {
+    const d = dateById(ds.date), wasConfirmed = !!d.confirmed, ev = {id:'e' + (S.nextId++), name:'', type:'', start:'', len:'', where:''};
+    (d.events = d.events || []).push(ev);
+    if (wasConfirmed) settle(d, true, 0, 'New event');
+    render(); renderSheet(`ev-${ev.id}-name`); return false;
+  },
+  'ev-remove'(ds) {
+    const d = dateById(ds.date), i = d.events.findIndex(e => e.id === ds.ev), wasMissing = missing(d).length, ev = d.events[i];
+    d.events.splice(i, 1);
+    if (ev.name) logChange({dateId:d.id, group:'extras', kind:'removed', label:'Event', from:ev.name});
+    settle(d, false, wasMissing, 'Event');
+    render(); renderSheet(); return false;
+  },
+  'close-sheet'() { closeSheet(); return false; },
+  confirm(ds) {
+    const d = dateById(ds.date);
+    if (missing(d).length) { sheet = {type:'blocked', dateId:d.id}; renderSheet(); return false; }
+    d.confirmed = {by:me().name, when:'Today, ' + fmtMin(S.now)};
+    S.changes.forEach(c => { if (c.kind === 'withdrawn' && c.open && c.dateId === d.id) { c.open = false; c.done = `${me().name} confirmed it again`; } });
+    logChange({dateId:d.id, kind:'confirmed', label:''});
+    toast(`${placeLabel(d)} confirmed`);
+  },
+  request(ds) {
+    const d = dateById(ds.date), x = missing(d).find(m => m.id === ds.field) || {id:ds.field, label:FIELD[ds.field].label, group:FIELD[ds.field].group};
+    if (!openReq(d.id, x.id)) logChange({dateId:d.id, group:x.group, field:x.id, kind:'request', label:x.label, open:true});
+    toast('Asked. Anyone who can edit this will see it.');
+    render(); if (sheet) renderSheet(); return false;
+  },
+  route(ds) {
+    const d = dateById(ds.date);
+    toast(val(d, 'routeLink') ? `Would open the saved route to ${dest(d)} (simulated)` : `Would open live directions to ${dest(d)} (simulated)`);
+    return false;
+  },
+  tile(ds) {
+    const d = dateById(ds.date), v = val(d, ds.field);
+    if (ds.kind === 'copy') { copy(v); toast('Copied'); }
+    else if (ds.kind === 'map') toast('Would open Maps (simulated)');
+    else if (ds.kind === 'call') toast(`Would call ${v} (simulated)`);
+    return false;
+  },
+  'plot-view'() {
+    let w = null;
+    if (plotURL) { try { w = window.open(plotURL, '_blank'); } catch (e) {} }
+    toast(w ? 'Opened in a new tab' : `Would open ${S.plot.name} (sample file)`);
+    return false;
+  },
+  'plot-send'(ds) { const d = dateById(ds.date); sheet = {type:'send', dateId:d.id, sms:!!val(d, 'dayPhone'), email:!!val(d, 'dayEmail')}; renderSheet(); return false; },
+  'send-via'(ds) { sheet[ds.via] = !sheet[ds.via]; renderSheet(); return false; },
+  'plot-send-go'() {
+    const d = dateById(sheet.dateId), via = [sheet.sms && val(d, 'dayPhone') && 'text', sheet.email && val(d, 'dayEmail') && 'email'].filter(Boolean).join(' and ');
+    d.v.plotSent = S.today;
+    logChange({dateId:d.id, group:'production', field:'plotSent', kind:'sent', label:'Stage plot', to:`${val(d, 'dayContact')} by ${via}`});
+    sheet = {type:'group', dateId:d.id, groupId:'production'}; render(); renderSheet();
+    toast(`Stage plot sent to ${val(d, 'dayContact')} by ${via} (simulated)`);
+    return false;
+  },
+  'copy-share'() { copy($('shareOut').textContent); toast('Day sheet copied'); return false; },
+  'send-share'(ds) { sheet = null; renderSheet(); toast(`Day sheet sent to the band by ${ds.via} (simulated)`); return false; },
+  'seen-all'() { myChanges().forEach(c => { if (!S.seen[S.role].includes(c.id)) S.seen[S.role].push(c.id); }); },
+  role(ds) { S.role = ds.role; sheet = null; renderSheet(); toast(`Viewing as ${me().name}`); },
+  offline() { S.offline = !S.offline; },
+  theme(ds) { S.theme = ds.themeVal; },
+  'today-step'(ds) { S.today = addDays(S.today, +ds.step); },
+  'time-step'(ds) { S.now = Math.max(0, Math.min(1439, S.now + (+ds.step))); },
+  reset() { S = seed(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Sample data restored'); },
+  'clear-data'() { S = clearedData(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Everything cleared. Name the tour and add its first date.'); },
+  'fill-data'() { S = filledData(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Every date filled in and confirmed'); },
+  'rig-open'() { $('rig').classList.add('open'); return false; },
+  'rig-close'() { $('rig').classList.remove('open'); return false; }
+};
+function copy(text) { try { navigator.clipboard.writeText(text).catch(() => {}); } catch (e) {} }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-action]');
+  if (!b || b.disabled || !ACT[b.dataset.action]) return;
+  if (ACT[b.dataset.action](b.dataset) !== false) render();
+});
+function onInput(e) {
+  const t = e.target;
+  if (t.id === 'nowIn') { const m = tmin(t.value); if (m != null) { S.now = m; render(); } return; }
+  if (t.id === 'todayIn') { if (validISO(t.value)) { S.today = t.value; render(); } return; }
+  if (t.dataset.df) { if (sheet && sheet.draft) sheet.draft[t.dataset.df] = t.value; return; }
+  if (e.type !== 'change' || !sheet) return;
+  if (t.id === 'plotFile') {
+    const file = t.files && t.files[0]; if (!file) return;
+    const had = S.plot && S.plot.name;
+    S.plot = {name:file.name, size:file.size < 1048576 ? Math.max(1, Math.round(file.size / 1024)) + ' KB' : (file.size / 1048576).toFixed(1) + ' MB'};
+    try { if (plotURL) URL.revokeObjectURL(plotURL); plotURL = URL.createObjectURL(file); } catch (err) { plotURL = null; }
+    logChange({dateId:sheet.dateId, group:'production', field:'plot', kind:had ? 'changed' : 'added', label:'Stage plot', from:had || '', to:file.name});
+    render(); renderSheet(); toast('Stage plot uploaded. It is used for every date.');
+    return;
+  }
+  const d = dateById(sheet.dateId);
+  if (t.dataset.ev) setEvent(d, t.dataset.ev, t.dataset.evf, t.value);
+  else if (t.dataset.input) setField(d, t.dataset.input, t.value);
+}
+document.addEventListener('change', onInput);
+document.addEventListener('input', e => { const t = e.target; if (t.id === 'nowIn' || t.id === 'todayIn' || (t.dataset && t.dataset.df)) onInput(e); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (sheet) closeSheet(); else $('rig').classList.remove('open'); }
+  if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.dataset && (e.target.dataset.input || e.target.dataset.ev)) e.target.blur();
+  if (e.key === 'Enter' && e.target.dataset && e.target.dataset.df && sheet) { e.preventDefault(); sheet.draft[e.target.dataset.df] = e.target.value; ACT[sheet.type === 'tourform' ? 'tf-save' : 'df-save']({}); }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
