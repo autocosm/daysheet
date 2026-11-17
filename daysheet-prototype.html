@@ -190,7 +190,9 @@ h1,h2,h3,p{margin:0}
 .next .lbl{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;opacity:.85}
 .next .big{font-size:1.85rem;font-weight:800;letter-spacing:-.03em;line-height:1.12;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.35)}
 .next .in{font-size:.95rem;font-weight:600;opacity:.9}
-.next--done{width:100%;text-align:left}
+button.next{width:100%;text-align:left}
+.nx-go{position:absolute;top:13px;right:10px;display:inline-flex;align-items:center;gap:1px;font-size:.8rem;font-weight:700;opacity:.85}
+.nx-go .ic{width:18px;height:18px}
 .alert{display:flex;gap:10px;align-items:center;width:100%;background:var(--yel-bg);color:var(--yel);border-radius:var(--r);padding:12px 14px;font-weight:700;font-size:.9rem;box-shadow:var(--e1)}
 .alert span{flex:1}
 .alert small{display:block;font-weight:500}
@@ -245,6 +247,9 @@ h1,h2,h3,p{margin:0}
 .prog .pg b{font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
 .meter{height:9px;border-radius:99px;background:var(--raised);overflow:hidden;margin-top:8px;box-shadow:inset 0 1px 2px rgba(10,14,25,.14)}
 .meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c-cyan),var(--c-mag));box-shadow:0 0 10px var(--primary-glow)}
+/* Complete is a status, so it takes the status color: solid green, with the check. */
+.prog.is-full .meter i{background:var(--ok);box-shadow:none}
+.prog .pg .gl{width:22px;height:22px;margin-right:7px;vertical-align:-3px;color:var(--ok)}
 .nextstep{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .nextstep .ns{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .nextstep small{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan)}
@@ -368,6 +373,8 @@ h1,h2,h3,p{margin:0}
 .pastword{font-style:normal;font-weight:700}
 .cd.is-past{opacity:.5}
 .datetile.is-past .m{background:var(--muted);color:var(--surface)}
+.cd--date.is-past{background:var(--raised)}
+.cd--date.is-past .cl{color:var(--muted)}
 .datetile.is-past b{color:var(--muted)}
 .pastnote{display:flex;align-items:center;gap:12px;border-radius:var(--r);padding:12px 14px;background:var(--raised);box-shadow:var(--hi)}
 .pastnote .gi{background:var(--surface);color:var(--muted)}
@@ -407,7 +414,11 @@ h1,h2,h3,p{margin:0}
   :is(.drow,.grow,.chg,button.tl-row,button.nextstep,.tab,button.cd--empty,#rigOpen,.rig-close):hover{background-color:var(--hover)}
   :is(button.tile,.cardbtn,button.card,.pill-btn,.navd,button.who,.sbtn,.btn--line,.blk button.is-sec):hover:not(:disabled){box-shadow:var(--e2),var(--hi);transform:translateY(-1px)}
   :is(.btn--primary,.sbtn--pri,.sbtn--bad,.blk button:not(.is-sec)):hover:not(:disabled){filter:brightness(1.1) saturate(1.06);transform:translateY(-1px)}
-  :is(.btn--blocked,.alert,.sh-x,.cd--date,.next--done,.cele-card):hover{filter:var(--hov-f)}
+  :is(.btn--blocked,.alert,.sh-x,.cd--date,.cele-card):hover{filter:var(--hov-f)}
+  button.next:hover{filter:brightness(1.16)}
+  button.next:hover .nx-go{opacity:1}
+  .btn--danger:hover{filter:brightness(1.12);transform:translateY(-1px)}
+  .toast-x:hover{background-color:rgba(128,128,128,.28)}
   .cd--date:hover{opacity:1;transform:translateY(-1px)}
   button.sg-b:hover{box-shadow:0 0 0 2px var(--cyan),var(--hi)}
   :is(.modes button,.vsw button,.seg button):hover:not([aria-pressed="true"]){color:var(--ink);background-color:var(--hover)}
@@ -447,6 +458,13 @@ h1,h2,h3,p{margin:0}
 .errmsg{color:var(--bad);font-size:.82rem;font-weight:700}
 .unit{display:flex;align-items:center;gap:10px}
 .unit input{flex:1;min-width:0}
+.inwrap{position:relative;display:block;flex:1;min-width:0}
+.okbtn{display:none;position:absolute;right:2px;top:2px;width:44px;height:44px;place-items:center;border-radius:10px;color:var(--on-primary);background:linear-gradient(180deg,var(--primary-a),var(--primary-b));box-shadow:var(--e1)}
+.okbtn .ic{width:22px;height:22px;stroke-width:2.4}
+@media (pointer:coarse){
+  .inwrap:focus-within .okbtn{display:grid}
+  .inwrap:focus-within input{padding-right:54px}
+}
 .unit span{font-weight:700;color:var(--muted);flex:none}
 .fld .val{font-size:1.05rem;font-weight:600;overflow-wrap:anywhere}
 .ask{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:44px;font-size:.88rem;font-weight:700;color:var(--cyan);padding:4px 0}
@@ -500,8 +518,25 @@ pre.out{margin:0;font:12.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap
 .tg--msg{background:linear-gradient(180deg,#35d07c,#149a52)}
 .tg--mail{background:linear-gradient(180deg,#27c3e6,#0b84a8)}
 .tg--copy{background:linear-gradient(180deg,var(--primary-a),var(--primary-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px var(--primary-glow)}
-.toast{position:absolute;left:16px;right:16px;top:46px;z-index:30;background:var(--ink);color:var(--surface);padding:12px 14px;border-radius:13px;font-weight:600;font-size:.9rem;text-align:center;opacity:0;transform:translateY(-8px);transition:.2s;pointer-events:none;box-shadow:var(--e2)}
-.toast.on{opacity:1;transform:none}
+.toast{position:absolute;left:16px;right:16px;top:46px;z-index:30;display:flex;align-items:center;gap:6px;background:var(--ink);color:var(--surface);padding:5px 5px 5px 16px;border-radius:14px;font-weight:600;font-size:.9rem;line-height:1.35;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .2s,transform .2s,visibility 0s .2s;pointer-events:none;box-shadow:var(--e2)}
+.toast.on{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition-delay:0s}
+.toast span{flex:1;min-width:0;padding:7px 0}
+.toast-x{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:10px;color:inherit}
+.toast-x .ic{width:18px;height:18px}
+
+/* ---------- confirmation dialog ---------- */
+.dlg{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:24px}
+.dlg[hidden]{display:none}
+.dlg--shell{position:fixed;z-index:90}
+.dlg--shell .dlg-card{max-width:380px}
+.dlg-bg{position:absolute;inset:0;background:rgba(5,8,14,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:celeIn .18s ease-out}
+.dlg-card{position:relative;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--surface);color:var(--ink);border:1px solid var(--card-line);border-radius:22px;padding:22px 18px 16px;box-shadow:0 30px 70px rgba(0,0,0,.45),var(--hi);animation:pop .28s cubic-bezier(.2,1.2,.4,1) both}
+.dlg-ic{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:var(--bad-bg);color:var(--bad)}
+.dlg-card h2{font-size:1.2rem;font-weight:800;letter-spacing:-.02em;line-height:1.2;text-wrap:balance}
+.dlg-card p{font-size:.92rem;line-height:1.45;color:var(--muted);text-wrap:pretty}
+.dlg-btns{display:flex;gap:10px;width:100%;margin-top:10px}
+.dlg-btns .btn{flex:1;min-height:48px;padding:10px 12px;font-size:.95rem}
+.btn--danger{background:var(--bad);color:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 
 @media (max-width:860px){
   body{background:var(--bg)}
@@ -528,6 +563,7 @@ pre.out{margin:0;font:12.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap
     <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden></section>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="cele" id="cele" role="status" hidden></div>
+    <div class="dlg" id="dlg" hidden></div>
   </div>
 
   <aside class="rig" id="rig" aria-label="Prototype controls">
@@ -550,8 +586,8 @@ pre.out{margin:0;font:12.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap
       <div class="seg" id="themeSeg"><button data-action="theme" data-theme-val="auto">Auto</button><button data-action="theme" data-theme-val="light">Light</button><button data-action="theme" data-theme-val="dark">Dark</button></div>
       <div class="row"><span>Data<small id="dataNote"></small></span></div>
       <div class="trio">
-        <button class="ghost" id="clearBtn" data-action="clear-data" title="Empty every value so the tour is filled in from scratch. Press twice.">Clear</button>
-        <button class="ghost" data-action="reset" title="Restore the testing defaults">Restore Sample</button>
+        <button class="ghost" data-action="clear-data" title="Empty every value so the tour is filled in from scratch">Clear</button>
+        <button class="ghost" data-action="reset" title="Go back to the sample tour and the testing defaults">Restart</button>
         <button class="ghost" data-action="fill-data" title="Complete and confirm every date">Fill</button>
       </div>
     </div>
@@ -581,6 +617,7 @@ pre.out{margin:0;font:12.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap
     </div>
   </aside>
 </div>
+<div class="dlg dlg--shell" id="dlgShell" hidden></div>
 
 <script>
 (() => {
@@ -630,7 +667,10 @@ const GROUPS = [
     {id:'guestList', label:'Guest list', type:'number', suf:'spots', hint:'Free entries you can give away.'}]},
   {id:'business', name:'Business', icon:'cash', fields:[
     {id:'dealType', label:'Deal', req:1, type:'select', options:['Guarantee','Door split','Guarantee plus split','Other'], hint:'How you get paid for the show.'},
-    {id:'guarantee', label:'Guarantee', type:'number', pre:'$', hint:'A fixed fee, whatever the turnout.'},
+    /* What the deal is decides which of these are asked for. */
+    {id:'guarantee', label:'Guarantee', type:'number', pre:'$', hint:'A fixed fee, whatever the turnout.', when:['Guarantee','Guarantee plus split']},
+    {id:'doorSplit', label:'Door split', type:'number', suf:'%', hint:'Your share of ticket sales at the door.', when:['Door split','Guarantee plus split']},
+    {id:'dealNote', label:'Description', hint:'How this deal works, in a line.', when:['Other']},
     {id:'payMethod', label:'Paid by', type:'select', options:['Cash','Check','Bank transfer']},
     {id:'settleWith', label:'Settle with', hint:'Who pays you, and when.'},
     {id:'merchCut', label:'Venue merch cut', type:'number', suf:'%', hint:'The share of your merch sales the venue keeps.'}]}
@@ -682,7 +722,7 @@ function seed() {
         departure:'10:00', wheelsUp:'10:15', driveMin:'195', loadIn:'15:30', soundcheck:'16:45', doors:'19:00', setTime:'21:00', setLength:'45', curfew:'23:00',
         lodgingPlace:'Blue Ridge Bunkhouse', lodgingAddress:'9 Haywood Ct, Asheville, NC', lodgingNotes:'Self check-in, code 4471',
         pa:'Full PA, no backline', plotSent:'2026-10-30', meals:'Meal provided', guestList:'4',
-        dealType:'Guarantee plus split', guarantee:'300', payMethod:'Check', settleWith:'Tomas, at close', merchCut:'15'}},
+        dealType:'Guarantee plus split', guarantee:'300', doorSplit:'20', payMethod:'Check', settleWith:'Tomas, at close', merchCut:'15'}},
       {id:'d3', date:'2026-11-14', city:'Knoxville, TN', kind:'show', confirmed:{by:'Evan', when:'Nov 6'},
         events:[{id:'e1', name:'WKNX radio session', type:'Radio', start:'13:45', len:'30', where:'600 Gay St, Knoxville, TN'}], v:{
         venueName:'Signal House', address:'418 Jackson Ave, Knoxville, TN', parking:'Loading zone on Jackson, side door with the red light',
@@ -691,7 +731,7 @@ function seed() {
         loadIn:'15:00', soundcheck:'16:30', doors:'19:00', setTime:'21:15', setLength:'45', curfew:'23:30',
         lodgingPlace:'Riverbend Motor Lodge', lodgingAddress:'1840 Chapman Hwy, Knoxville, TN', checkInBy:'01:00', lodgingNotes:'Confirmation RB-20417',
         pa:'Full PA, shared drum kit', plotSent:'2026-11-01', meals:'Buyout', buyout:'12', guestList:'5',
-        dealType:'Door split', payMethod:'Cash', settleWith:'Marcus, at the bar', merchCut:'0'}},
+        dealType:'Door split', doorSplit:'70', payMethod:'Cash', settleWith:'Marcus, at the bar', merchCut:'0'}},
       {id:'d4', date:'2026-11-15', city:'Off day', kind:'off', confirmed:null, events:[], v:{departure:'11:00', wheelsUp:'11:15', driveMin:'165'}},
       {id:'d5', date:'2026-11-16', city:'Nashville, TN', kind:'show', confirmed:null,
         events:[{id:'e2', name:'After-party', type:'After-party', start:'23:30', len:'90', where:'The Velvet Annex, 911 Gallatin Ave'}], v:{
@@ -712,6 +752,7 @@ function seed() {
 
 /* Placeholder values used by "Fill" for anything the sample tour leaves empty. */
 const DUMMY = {
+  doorSplit:'70', dealNote:'Flat fee plus a bar tab',
   venueName:'The Room', address:'100 Main St', parking:'Lot behind the venue, stage door', wifi:'venue-guest / welcome',
   dayContact:'Alex Morgan', dayPhone:'(555) 010-0100', dayEmail:'booking@venue.example', soundContact:'House engineer',
   loadIn:'16:00', soundcheck:'17:00', doors:'19:00', setTime:'21:00', setLength:'45', curfew:'23:30',
@@ -733,7 +774,7 @@ function filledData() {
   const n = keepSession(seed());
   n.dates.forEach(d => {
     (d.kind === 'off' ? [GROUP.lodging, GROUP.routing] : GROUPS).forEach(g => g.fields.forEach(f => {
-      if (!(d.v[f.id] || '').trim() && !(f.showOnly && d.kind === 'off')) d.v[f.id] = DUMMY[f.id];
+      if (!(d.v[f.id] || '').trim() && applies(d, f) && DUMMY[f.id] != null) d.v[f.id] = DUMMY[f.id];
     }));
     if (!d.confirmed) d.confirmed = {by:'Evan', when:'Nov 10'};
   });
@@ -744,7 +785,7 @@ function filledData() {
 
 let S;                               // loaded at the bottom, once every helper it needs exists
 let sheet = null;                    // {type:'group'|'blocked'|'share'|'people'|'send', dateId, groupId, from}
-let lastViewKey = '', rolesHTML = '', clearArmed = false, clearT = 0;
+let lastViewKey = '', rolesHTML = '';
 let plotURL = null;                  // a real uploaded PDF lives only for this browser session
 
 function load() {
@@ -796,7 +837,8 @@ function scopeText(p) {
 /* ---------- model ---------- */
 const dateById = id => S.dates.find(d => d.id === id);
 const groupsFor = d => d.kind === 'off' ? [GROUP.extras, GROUP.lodging, GROUP.routing] : GROUPS;
-const fieldsFor = (d, g) => g.fields.filter(f => canSeeField(f) && !(f.showOnly && d.kind === 'off'));
+const applies = (d, f) => !(f.showOnly && d.kind === 'off') && !(f.when && !f.when.includes((d.v.dealType || '').trim()));
+const fieldsFor = (d, g) => g.fields.filter(f => canSeeField(f) && applies(d, f));
 const val = (d, f) => (d.v[f] || '').trim();
 const evKey = (ev, f) => `ev-${ev.id}-${f.id}`;
 /* An event nobody has typed into yet is a draft: it is not counted, and it is dropped when its sheet closes. */
@@ -851,7 +893,9 @@ const todayWord = () => lateNight() ? 'Tonight' : 'Today';
 /* A date before the current tour day is history: still readable and correctable, no longer something to get ready for. */
 const isPast = d => d.date < tday();
 const pastWord = d => d.kind === 'off' ? 'Past' : 'Played';
-const tourDone = () => S.dates.length > 0 && S.dates.every(d => status(d) === 'confirmed');
+/* Confirmation is about getting ready, so a date that has been played no longer takes part in it. */
+const ahead = () => S.dates.filter(d => !isPast(d));
+const tourDone = () => { const a = ahead(); return a.length > 0 && a.every(d => status(d) === 'confirmed'); };
 const phoneLike = v => (String(v).match(/\d/g) || []).length >= 7;
 const listAnd = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 function fmtMin(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; const h = Math.floor(m / 60); return `${h % 12 || 12}:${pad(m % 60)} ${h < 12 ? 'AM' : 'PM'}`; }
@@ -1004,6 +1048,8 @@ const I = {
   plus:'<path d="M12 5.5v13M5.5 12h13"/>', minus:'<path d="M5.5 12h13"/>',
   swap:'<path d="M4.5 8.5h14l-3.5-3.5M19.5 15.5h-14l3.5 3.5"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  trash:'<path d="M4.5 7h15M10 7V4.8h4V7M6.5 7l1 12.2h9l1-12.2M10.3 10.8v5M13.7 10.8v5"/>',
   undo:'<path d="M8 5.5l-4 4 4 4M4.5 9.5h9a5.5 5.5 0 010 11h-3"/>',
   ask:'<path d="M9 9a3 3 0 115 2.2c-1 .8-2 1.5-2 3.1"/><circle cx="12" cy="18.3" r=".9" fill="currentColor"/>',
   send:'<path d="M20.5 3.5l-17 7 6.5 3 3 6.5zM10 13.5l10.5-10"/>'
@@ -1015,6 +1061,7 @@ const GL = {
   ready:'<circle cx="10" cy="10" r="7.8" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="10" cy="10" r="3.2" fill="currentColor"/>',
   needs:'<path d="M10 1.2l8.8 8.8-8.8 8.8L1.2 10z" fill="currentColor"/><path d="M10 5.8v5" stroke="var(--glyph-ink)" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="13.8" r="1.25" fill="var(--glyph-ink)"/>'
 };
+const I_CHECK = ic('check');
 const gl = s => `<svg class="gl" viewBox="0 0 20 20" aria-hidden="true">${GL[s]}</svg>`;
 function chip(d, long) {
   const s = vstatus(d), n = vmissing(d).length, g = !isBand();
@@ -1032,7 +1079,7 @@ function dateRow(d) {
   return `<button class="drow ${isT ? 'is-today' : ''} ${gone ? 'is-past' : ''} ${d.kind === 'off' ? 'is-off' : ''}" data-action="open-date" data-date="${d.id}">
       <span class="dd"><small>${d.dow}</small><b class="num">${d.day}</b></span>
       <span class="dm"><b>${esc(placeLabel(d))}</b><small>${lead}${esc(sub)}</small></span>
-      ${chip(d)}
+      ${gone ? '' : chip(d)}
     </button>`;
 }
 const viewSwitch = (which, cur, opts) => `<div class="vsw" role="group" aria-label="${which === 'tour' ? 'Dates' : 'Schedule'} view">${opts.map(([id, icon, label]) =>
@@ -1051,9 +1098,9 @@ function calendar(ds, plan) {
     for (let day = 1; day <= days; day++) {
       const iso = `${y}-${pad(m)}-${pad(day)}`, d = by[iso], today = iso === tday() ? ' is-today' : iso < tday() ? ' is-past' : '';
       if (d) {
-        const st = vstatus(d), off = d.kind === 'off', n = vmissing(d).length;
-        const say = `${dateLabel(d)}. ${placeLabel(d)}. ${st === 'confirmed' ? 'Confirmed' : st === 'ready' ? (isBand() ? 'Ready to confirm' : 'Not confirmed yet') : n + ' missing'}${today === ' is-today' ? '. Today' : today ? '. ' + pastWord(d) : ''}`;
-        cells.push(`<button class="cd cd--date st-${st}${off ? ' is-off' : ''}${today}" data-action="open-date" data-date="${d.id}" aria-label="${esc(say)}"><span class="cn num">${day}</span>${gl(st)}<span class="cl">${esc(off ? 'Off' : town(d))}</span></button>`);
+        const st = vstatus(d), off = d.kind === 'off', n = vmissing(d).length, gone = today === ' is-past';
+        const say = gone ? `${dateLabel(d)}. ${placeLabel(d)}. ${pastWord(d)}` : `${dateLabel(d)}. ${placeLabel(d)}. ${st === 'confirmed' ? 'Confirmed' : st === 'ready' ? (isBand() ? 'Ready to confirm' : 'Not confirmed yet') : n + ' missing'}${today === ' is-today' ? '. Today' : today ? '. ' + pastWord(d) : ''}`;
+        cells.push(`<button class="cd cd--date ${gone ? '' : 'st-' + st}${off ? ' is-off' : ''}${today}" data-action="open-date" data-date="${d.id}" aria-label="${esc(say)}"><span class="cn num">${day}</span>${gone ? '' : gl(st)}<span class="cl">${esc(off ? 'Off' : town(d))}</span></button>`);
       } else if (plan && !taken.has(iso)) cells.push(`<button class="cd cd--empty${today}" data-action="date-add" data-iso="${iso}" aria-label="Add a date on ${isoLabel(iso)}"><span class="cn num">${day}</span></button>`);
       else cells.push(`<span class="cd cd--empty${today}"><span class="cn num">${day}</span></span>`);
     }
@@ -1068,7 +1115,11 @@ function doneLine() {
   const shows = S.dates.filter(d => d.kind === 'show').length, off = S.dates.length - shows;
   return `${shows} show${shows === 1 ? '' : 's'}${off ? ` and ${off} off day${off === 1 ? '' : 's'}` : ''}, ${rangeText()}`;
 }
-const doneHead = () => S.dates.length === 1 ? 'The one date is confirmed' : S.dates.length === 2 ? 'Both dates confirmed' : `All ${S.dates.length} dates confirmed`;
+function doneHead() {
+  const n = S.dates.length, k = ahead().length;
+  if (k < n && !S.dates.every(d => status(d) === 'confirmed')) return k === 1 ? 'The last date is confirmed' : `All ${k} remaining dates confirmed`;
+  return n === 1 ? 'The one date is confirmed' : n === 2 ? 'Both dates confirmed' : `All ${n} dates confirmed`;
+}
 function doneHero() {
   return `<div class="done">${LIGHTS}<div class="dt"><span class="lbl">Tour complete</span><b class="big">${doneHead()}</b><span class="in">${esc(doneLine())}</span></div><button class="replay" data-action="celebrate" aria-label="Play the celebration again">${ic('undo')}</button></div>`;
 }
@@ -1078,9 +1129,8 @@ function celebrate() {
   let k = 11; const rnd = () => (k = (k * 16807) % 2147483647) / 2147483647, cols = ['#19c8e6','#ec2c9a','#f7c81a','#ffffff'];
   /* Confetti in the three gel colors. Skipped entirely for anyone who has asked for less motion. */
   const bits = calm ? '' : Array.from({length:84}, (_, i) => { const w = 6 + rnd() * 6, sh = i % 3; return `<i style="left:${Math.round(rnd() * W)}px;width:${w.toFixed(1)}px;height:${(sh === 1 ? w : w * .45).toFixed(1)}px;border-radius:${sh === 2 ? '50%' : '2px'};background:${cols[i % 4]};--dx:${Math.round((rnd() - .5) * 130)}px;--h:${H + 40}px;--r:${Math.round((rnd() * 720 + 360) * (rnd() < .5 ? -1 : 1))}deg;animation-delay:${(rnd() * .9).toFixed(2)}s;animation-duration:${(1.9 + rnd() * 1.7).toFixed(2)}s"></i>`; }).join('');
-  const ahead = S.dates.some(d => !isPast(d));
   el.innerHTML = `<div class="cele-bits" aria-hidden="true">${bits}</div>
-    <button class="cele-card" data-action="cele-close">${LIGHTS}<span class="lbl">Tour complete</span><b>${doneHead()}</b><span class="in">${esc(ahead ? `${S.tour.name || 'The tour'} is ready for the road.` : 'Every date went out confirmed.')}</span><span class="cta">See the tour</span></button>`;
+    <button class="cele-card" data-action="cele-close">${LIGHTS}<span class="lbl">Tour complete</span><b>${doneHead()}</b><span class="in">${esc(`${S.tour.name || 'The tour'} is ready for the road.`)}</span><span class="cta">See the tour</span></button>`;
   el.hidden = false; $('toast').classList.remove('on');
   el.querySelector('.cele-card').focus({preventScroll:true});
   clearTimeout(celeT); celeT = setTimeout(closeCele, 7000);
@@ -1088,7 +1138,7 @@ function celebrate() {
 function closeCele() { clearTimeout(celeT); const el = $('cele'); if (el.hidden) return false; el.hidden = true; el.innerHTML = ''; return true; }
 function viewTour() {
   const ds = S.dates.filter(inScope), c = {confirmed:0, ready:0, needs:0}, plan = canPlan(), t = S.tour, tv = S.tourView === 'cal' ? 'cal' : 'list', band = isBand(), played = ds.filter(isPast).length;
-  ds.forEach(d => c[vstatus(d)]++);
+  ds.filter(d => !isPast(d)).forEach(d => c[vstatus(d)]++);
   const kicker = isBand() ? [t.artist, rangeText()].filter(Boolean).join(' · ') : `Shared by ${t.artist || 'the band'} · view only`;
   const head = `<div class="headrow">
       <div class="head"><p class="kicker">${esc(kicker)}</p><h1 class="title">${esc(t.name || 'Untitled tour')}</h1></div>
@@ -1134,14 +1184,14 @@ function viewDate(d, onTodayTab) {
   return `
     ${onTodayTab && !steps ? '' : `<div class="navrow">${onTodayTab ? '<span></span>' : `<button class="backbtn" data-action="back">${ic('back')}Tour</button>`}${steps}</div>`}
     <div class="dayhead">
-      <div class="datetile ${isToday ? 'is-today' : isPast(d) ? 'is-past' : ''}" aria-hidden="true"><span class="m">${d.mon}</span><b class="num">${d.day}</b><span class="w">${d.dow}</span></div>
+      <div class="datetile ${isToday ? 'is-today' : isPast(d) ? 'is-past' : ''}" aria-hidden="true"><span class="m">${d.dow}</span><b class="num">${d.day}</b><span class="w">${d.mon}</span></div>
       <div class="head">
         <p class="kicker"><span class="vh">${dateLabel(d)}. </span>${count}${isToday ? ` · <em>${todayWord()}</em>` : isPast(d) ? ` · ${pastWord(d)}` : ''}</p>
         <h1 class="title">${esc(placeLabel(d))}</h1>
         <p class="sub">${esc(d.kind === 'off' ? 'Travel and rest. No show.' : (val(d, 'venueName') || 'Venue not entered'))}</p>
       </div>
     </div>
-    <div class="chips">${chip(d, true)}${live ? `<span class="chip chip--live"><i class="pulse"></i>${esc(phaseText(live))}</span>` : ''}</div>
+    ${isPast(d) ? '' : `<div class="chips">${chip(d, true)}${live ? `<span class="chip chip--live"><i class="pulse"></i>${esc(phaseText(live))}</span>` : ''}</div>`}
     <div class="modes" role="group" aria-label="View">
       <button data-action="mode" data-mode="sheet" aria-pressed="${mode === 'sheet'}">Day sheet</button>
       <button data-action="mode" data-mode="advance" aria-pressed="${mode === 'advance'}">${band ? 'Advance' : 'Details'}</button>
@@ -1261,10 +1311,11 @@ function daySheet(d, isToday, live) {
   };
   /* After the last thing on the schedule, the card points at the bed instead of going blank. */
   const over = isToday && !next && !live && A.some(x => x.min != null) && canSee('lodging');
-  const hero = next ? `<div class="next"><span class="lbl">Next up</span><span class="big num">${esc(next.drive ? 'Depart' : next.label)} ${esc(next.v)}</span><span class="in">in ${dur(next.min - n)}${next.drive ? ' · ' + esc(next.label) : ''}</span></div>`
+  /* Next up opens what it names: the route for a drive, otherwise the section the time comes from. */
+  const hero = next ? `<button class="next" ${next.drive ? `data-action="route" data-date="${d.id}"` : `data-action="group" data-date="${d.id}" ${target(next)}`}><span class="lbl">Next up</span><span class="big num">${esc(next.drive ? 'Depart' : next.label)} ${esc(next.v)}</span><span class="in">in ${dur(next.min - n)}${next.drive ? ' · ' + esc(next.label) : ''}</span><span class="nx-go">${next.drive ? 'Route' : ''}${ic('chev')}</span></button>`
     : over ? `<button class="next next--done" data-action="group" data-group="lodging" data-date="${d.id}" data-focus="lodgingPlace"><span class="lbl">Done for ${lateNight() ? 'tonight' : 'today'}</span><span class="big">${place ? esc(place) : 'Lodging not entered'}</span><span class="in">${esc([val(d, 'checkInBy') && 'Check in by ' + show(d, 'checkInBy'), val(d, 'lodgingAddress')].filter(Boolean).join(' · ') || (place ? 'Where you are sleeping tonight' : 'Nobody has added where you are sleeping'))}</span></button>` : '';
   return `
-    ${band && m.length ? `<button class="alert" data-action="blocked" data-date="${d.id}">${gl('needs')}<span>${m.length} required ${m.length === 1 ? 'detail is' : 'details are'} missing<small>See what is missing</small></span>${ic('chev')}</button>` : ''}
+    ${band && m.length && !gone ? `<button class="alert" data-action="blocked" data-date="${d.id}">${gl('needs')}<span>${m.length} required ${m.length === 1 ? 'detail is' : 'details are'} missing<small>See what is missing</small></span>${ic('chev')}</button>` : ''}
     ${gone ? `<div class="pastnote"><span class="gi">${ic('check')}</span><span><b>${d.kind === 'off' ? 'This day has passed' : 'This show has been played'}</b><small>${(g => g === 1 ? 'Yesterday' : g + ' days ago')(Math.round((new Date(tday() + 'T12:00:00') - new Date(d.date + 'T12:00:00')) / 864e5))} · kept for the record</small></span></div>` : hero}
     ${first ? lodging('First stop · lodging') : ''}
     ${tiles.length ? `<div class="tiles">${tiles.join('')}</div>` : ''}
@@ -1272,10 +1323,17 @@ function daySheet(d, isToday, live) {
     ${first ? '' : lodging(gone ? 'Lodging that night' : "Tonight's lodging")}
     ${d.kind === 'show' && canSee('production') && S.plot && (band || val(d, 'plotSent')) ? `<button class="card doc" data-action="plot-view"><span class="gi">${ic('file')}</span><span class="fmeta"><b>${esc(S.plot.name)}</b><small>Stage plot · ${esc(S.plot.size)}</small></span><span class="go">View</span></button>` : ''}
     ${nd && inScope(nd) ? `<button class="card cardbtn" data-action="open-date" data-date="${nd.id}" data-mode="sheet"><h2>${nd.date === addDays(d.date, 1) ? (gone ? 'The next day' : 'Tomorrow') : 'Next date · ' + dateLabel(nd)}</h2><div class="kv"><b>${esc(placeLabel(nd))}${val(nd, 'venueName') ? ' · ' + esc(val(nd, 'venueName')) : ''}</b>${canSee('routing') ? `<span>${val(nd, 'departure') ? 'Van call ' + esc(show(nd, 'departure')) : 'Van call not set'}${driveText(nd) ? ' · ' + esc(driveText(nd)) : ''}</span>` : ''}</div></button>` : ''}
-    ${band ? `<button class="btn btn--line" data-action="share" data-date="${d.id}">${ic('share')}Share day sheet</button>` : ''}`;
+    ${band ? `<button class="btn btn--line" data-action="share" data-date="${d.id}">${ic('share')}Share day sheet</button>` : ''}
+    ${band && !gone && status(d) === 'ready' ? confirmCTA(d) : ''}`;
 }
 
 const confWhen = c => c.day ? whenText(c) : (c.when || '');
+/* The same call to action on the Day sheet and on Advance, so a ready date can be confirmed from either. */
+function confirmCTA(d) {
+  if (!me().confirm) return '';
+  const u = d.unconf, why = u ? `<p class="note whynote">${esc(u.manual ? `${u.manual} withdrew the confirmation.` : `${u.why} after ${u.by} confirmed this date.`)} Check it, then confirm again.</p>` : '';
+  return `${why}<button class="btn btn--primary" data-action="confirm" data-date="${d.id}">${u ? 'Confirm again' : 'Confirm this date'}</button>`;
+}
 function advance(d) {
   const band = isBand(), gs = groupsFor(d).filter(g => canSee(g.id)), m = vmissing(d), s = vstatus(d);
   const total = groupsFor(d).reduce((n, g) => n + groupStat(d, g).req, 0), done = total - missing(d).length;
@@ -1298,18 +1356,21 @@ function advance(d) {
     else step = `<div class="nextstep"><span class="ns"><small>Waiting on</small><b>${esc(x.label)}</b><span>Asked${r.to ? ' ' + esc(nameOf(r.to)) : ''} · ${where}</span></span></div>`;
   }
   let foot;
-  if (s === 'confirmed') foot = `<div class="stamp">${gl('confirmed')}<span>${band ? 'Confirmed' : 'Details confirmed'}<small>By ${esc(d.confirmed.by)} · ${esc(confWhen(d.confirmed))}</small></span></div>${me().confirm ? `<button class="linkbtn" data-action="unconfirm" data-date="${d.id}">Withdraw confirmation</button>` : ''}`;
+  const gone = isPast(d), stamp = d.confirmed ? `<div class="stamp">${gl('confirmed')}<span>${band ? 'Confirmed' : 'Details confirmed'}<small>By ${esc(d.confirmed.by)} · ${esc(confWhen(d.confirmed))}</small></span></div>` : '';
+  if (gone) foot = stamp;                               // history: the stamp stays as a record, with nothing left to confirm or withdraw
+  else if (s === 'confirmed') foot = `${stamp}${me().confirm ? `<button class="linkbtn" data-action="unconfirm" data-date="${d.id}">Withdraw confirmation</button>` : ''}`;
   else if (!band) foot = `<div class="card"><b>Not confirmed yet</b><p class="note">${n ? `${n} required ${dets} still missing.` : `${esc(S.tour.artist || 'The band')} has not confirmed this date yet.`}</p></div>`;
   else {
     /* A confirmation covers the required details as they stood. If one changes, the date goes back to be confirmed again. */
-    const u = d.unconf, why = u ? `<p class="note whynote">${esc(u.manual ? `${u.manual} withdrew the confirmation.` : `${u.why} after ${u.by} confirmed this date.`)}${s === 'ready' ? ' Check it, then confirm again.' : ''}</p>` : '';
-    if (s === 'ready') foot = why + (me().confirm ? `<button class="btn btn--primary" data-action="confirm" data-date="${d.id}">${u ? 'Confirm again' : 'Confirm this date'}</button>` : `<div class="card"><b>Everything required is in</b><p class="note">Waiting for the tour manager to confirm.</p></div>`);
+    const u = d.unconf, why = u ? `<p class="note whynote">${esc(u.manual ? `${u.manual} withdrew the confirmation.` : `${u.why} after ${u.by} confirmed this date.`)}</p>` : '';
+    if (s === 'ready') foot = me().confirm ? confirmCTA(d) : `${why}<div class="card"><b>Everything required is in</b><p class="note">Waiting for the tour manager to confirm.</p></div>`;
     else foot = why + (me().confirm ? `<button class="btn btn--blocked" data-action="confirm" data-date="${d.id}">Confirm this date<small>${n} required ${dets} missing</small></button>`
       : `<button class="btn btn--blocked" data-action="blocked" data-date="${d.id}">Not confirmed yet<small>See the ${n} missing ${dets}</small></button>`);
   }
+  const full = total > 0 && done === total;
   return `
-    ${isPast(d) ? `<p class="ronote">${ic('clock')}<span>This date has passed.${band ? ' You can still correct it, or confirm it for the record.' : ''}</span></p>` : ''}
-    ${band ? `<div class="card prog"><h2>Required details</h2><p class="pg num"><b>${done}</b> of ${total} entered</p><div class="meter"><i style="width:${total ? Math.round(done / total * 100) : 100}%"></i></div>${step}</div>` : ''}
+    ${gone ? `<p class="ronote">${ic('clock')}<span>This date has passed.${band ? ' You can still correct the details for the record.' : ''}</span></p>` : ''}
+    ${band && !gone ? `<div class="card prog ${full ? 'is-full' : ''}"><h2>Required details</h2><p class="pg num">${full ? gl('confirmed') : ''}<b>${done}</b> of ${total} entered</p><div class="meter"><i style="width:${total ? Math.round(done / total * 100) : 100}%"></i></div>${step}</div>` : ''}
     ${canPlan() ? `<div class="list"><button class="grow" data-action="date-edit" data-date="${d.id}"><span class="gi">${ic('cal')}</span><span class="gt"><b>Date and place</b> <small>${esc(`${dateLabel(d)} · ${d.kind === 'off' ? 'Off day' : 'Show · ' + d.city}`)}</small></span> <span class="gs gs--opt">Edit</span>${ic('chev')}</button></div>` : ''}
     <div class="list">${rows}</div>
     ${foot}`;
@@ -1342,10 +1403,12 @@ function viewChanges() {
 }
 
 /* ---------- sheets ---------- */
+/* On touch, the field being edited carries its own check button, so saving does not depend on tapping somewhere else. */
+const OKBTN = '<button type="button" class="okbtn" data-action="field-ok" tabindex="-1" aria-label="Save this field">' + I_CHECK + '</button>';
 function control(f, v, attrs) {
   if (f.type === 'select') return `<select ${attrs}><option value="">Not set</option>${f.options.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
-  if (f.type === 'number') return `<div class="unit">${f.pre ? `<span>${f.pre}</span>` : ''}<input ${attrs} type="number" inputmode="numeric" min="0" step="1" value="${esc(v)}">${f.suf ? `<span>${f.suf}</span>` : ''}</div>`;
-  return `<input ${attrs} type="${f.type || 'text'}" value="${esc(v)}" autocomplete="off">`;
+  if (f.type === 'number') return `<div class="unit">${f.pre ? `<span>${f.pre}</span>` : ''}<div class="inwrap"><input ${attrs} type="number" inputmode="numeric" enterkeyhint="done" min="0" step="1" value="${esc(v)}">${OKBTN}</div>${f.suf ? `<span>${f.suf}</span>` : ''}</div>`;
+  return `<div class="inwrap"><input ${attrs} type="${f.type || 'text'}" enterkeyhint="done" value="${esc(v)}" autocomplete="off">${OKBTN}</div>`;
 }
 const reqTag = f => f.req ? '<span class="req">Required</span>' : '';
 const sheetHead = (title, sub, close, icon) => `<div class="sh-head">${icon ? `<span class="sh-ic">${icon}</span>` : ''}<div><h2 id="sheetTitle">${title}</h2><p id="sheetStat">${esc(sub)}</p></div><button class="sh-x" data-action="close-sheet">${close}</button></div>`;
@@ -1516,11 +1579,9 @@ function sheetDateForm() {
         : `<p class="note">An off day has no show. It still needs lodging and a van call.</p>`}
       ${d && d.kind === 'show' && !show ? `<p class="note">Venue, schedule and deal details are kept, but hidden while this is an off day.</p>` : ''}
       ${d && d.confirmed ? `<p class="note">This date is confirmed. Moving it or changing its type withdraws the confirmation.</p>` : ''}
-      ${!d ? '' : sheet.confirmRemove ? `<div class="box box--bad"><b>Remove ${dateLabel(d)}?</b><span class="note">${n ? `The ${n} detail${n === 1 ? '' : 's'} entered for it will be deleted.` : 'Nothing has been entered for it yet.'} This can't be undone.</span>
-          <div class="frow"><button class="sbtn sbtn--bad" data-action="df-remove-go">Remove date</button><button class="sbtn" data-action="df-remove-cancel">Keep it</button></div></div>`
-        : `<button class="linkbtn danger" data-action="df-remove">Remove this date</button>`}
+      ${d ? `<button class="linkbtn danger" data-action="df-remove">Remove this date</button>` : ''}
     </div>
-    <div class="sh-foot">${sheet.askDiscard ? discardBox() : d ? `<button class="btn btn--primary" data-action="df-save">Save changes</button>`
+    <div class="sh-foot">${d ? `<button class="btn btn--primary" data-action="df-save">Save changes</button>`
       : `<button class="btn btn--primary" data-action="df-save">Add date</button><button class="btn btn--line" data-action="df-save" data-again="1">Add and start another</button>`}</div>`;
 }
 function sheetTourForm() {
@@ -1530,7 +1591,7 @@ function sheetTourForm() {
       <div class="fld ${e.name ? 'is-bad' : ''}"><label for="in-df-name">Tour name<span class="req">Required</span></label><input id="in-df-name" data-df="name" type="text" value="${esc(f.name)}" autocomplete="off" ${e.name ? 'aria-invalid="true" aria-describedby="err-name"' : ''}>${e.name ? `<span class="errmsg" id="err-name">${esc(e.name)}</span>` : ''}</div>
       <div class="fld"><label for="in-df-artist">Artist or band</label><input id="in-df-artist" data-df="artist" type="text" value="${esc(f.artist)}" autocomplete="off"></div>
     </div>
-    <div class="sh-foot">${sheet.askDiscard ? discardBox() : '<button class="btn btn--primary" data-action="tf-save">Save</button>'}</div>`;
+    <div class="sh-foot"><button class="btn btn--primary" data-action="tf-save">Save</button></div>`;
 }
 
 /* ---------- render ---------- */
@@ -1555,7 +1616,6 @@ function render() {
   const roleBtn = id => { const p = S.people[id]; return `<button class="role" data-action="role" data-role="${id}" aria-pressed="${S.role === id}"><span class="av">${p.name[0]}</span><span><b>${p.name}</b><small>${esc(tagOf(p))}</small></span></button>`; };
   /* Rebuilt only when it changes, so a click on a role is never swallowed by a save that re-renders mid-click. */
   { const h = '<h3>Band</h3>' + ORDER.filter(id => S.people[id].kind === 'band').map(roleBtn).join('') + '<h3>Shared a link</h3>' + ORDER.filter(id => S.people[id].kind === 'guest').map(roleBtn).join(''); if (h !== rolesHTML) { $('roles').innerHTML = h; rolesHTML = h; } }
-  $('clearBtn').textContent = clearArmed ? 'Sure?' : 'Clear';
   $('swOff').setAttribute('aria-checked', S.offline);
   $('offlineBar').hidden = !S.offline;
   $('net').textContent = S.offline ? 'No service' : 'LTE';
@@ -1588,8 +1648,29 @@ function refreshGroupSheet() {
   $('sheet').querySelectorAll('[data-evt]').forEach(b => { const ev = (d.events || []).find(e => e.id === b.dataset.evt); if (ev) b.textContent = ev.name || 'New event'; });
   const st = $('sheetStat'); if (st) st.textContent = groupLine(d, GROUP[sheet.groupId]);
 }
+/* One confirmation dialog for anything that cannot be undone. Cancel has the focus, and the red button says what it does.
+   In-app actions ask inside the phone; prototype-shell actions ask over the whole page. */
+let dlg = null, lastSig = null, focusNext = null;
+function askConfirm(o) {
+  closeDlg(); dlg = o; o.opener = lastSig;
+  const el = $(o.shell ? 'dlgShell' : 'dlg');
+  el.innerHTML = `<div class="dlg-bg" data-action="dlg-cancel"></div><div class="dlg-card" role="alertdialog" aria-modal="true" aria-labelledby="dlgT" aria-describedby="dlgB">
+    <span class="dlg-ic">${ic(o.icon || 'trash')}</span><h2 id="dlgT">${esc(o.title)}</h2><p id="dlgB">${esc(o.body)}</p>
+    <div class="dlg-btns"><button class="btn btn--line" data-action="dlg-cancel">${esc(o.cancel || 'Cancel')}</button><button class="btn btn--danger" data-action="dlg-ok">${esc(o.ok)}</button></div></div>`;
+  el.hidden = false; el.querySelector('button[data-action="dlg-cancel"]').focus();
+}
+function closeDlg() {
+  if (!dlg) return null;
+  const o = dlg; dlg = null; focusNext = o.opener;
+  ['dlg','dlgShell'].forEach(id => { const el = $(id); el.hidden = true; el.innerHTML = ''; });
+  return o;
+}
 let toastT;
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+function toast(msg) {
+  const t = $('toast');
+  t.innerHTML = `<span>${esc(msg)}</span><button class="toast-x" data-action="toast-close" aria-label="Dismiss">${ic('x')}</button>`;
+  t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 4000);
+}
 
 /* ---------- actions ---------- */
 /* A confirmation covers the required details as they stood when it was given.
@@ -1601,7 +1682,7 @@ function withdraw(d, was, label, how, group) {
 }
 function settle(d, was, wasMissing, label, done, touched, how, group) {
   const nowMissing = missing(d).length;
-  if (was && (touched || nowMissing)) { withdraw(d, was, label, how, group); toast(`${label} ${how}, so the confirmation was withdrawn.`); }
+  if (was && !isPast(d) && (touched || nowMissing)) { withdraw(d, was, label, how, group); toast(`${label} ${how}, so the confirmation was withdrawn.`); }
   else if (wasMissing && !nowMissing) toast('Everything required is in. Ready to confirm.');
   else toast(S.offline ? 'Saved on this phone. It will sync later.' : done ? `Saved. ${done.who}'s request is done.` : 'Saved');
 }
@@ -1619,7 +1700,9 @@ function setField(d, fid, raw) {
   d.v[fid] = next;
   logChange({dateId:d.id, group:f.group, field:fid, kind: !prev ? 'added' : !next ? 'removed' : 'changed', label:f.label, from, to:fmt(f, next)});
   settle(d, was, wasMissing, f.label, next && answer(d, fid), !!f.req, !prev ? 'was added' : !next ? 'was removed' : 'changed', f.group);
-  render(); refreshGroupSheet();
+  render();
+  /* Changing the deal changes which fields exist, so that sheet is drawn again with focus kept on the choice. */
+  if (fid === 'dealType' && sheet && sheet.type === 'group') renderSheet('dealType'); else refreshGroupSheet();
 }
 function setEvent(d, evId, fid, raw) {
   const ev = (d.events || []).find(e => e.id === evId); if (!ev) return;
@@ -1643,7 +1726,9 @@ function closeSheet(force) {
   const a = document.activeElement; if (a && (a.tagName === 'INPUT' || a.tagName === 'SELECT')) commit(a);
   const was = sheet;
   /* Tour and date forms only save on their button, so leaving one with typing in it asks first. */
-  if (was && was.orig != null && !force && JSON.stringify(was.draft) !== was.orig) { was.askDiscard = true; renderSheet(); return; }
+  if (was && was.orig != null && !force && JSON.stringify(was.draft) !== was.orig) {
+    askConfirm({title:'Discard what you entered?', body:'It has not been saved yet.', ok:'Discard', cancel:'Keep editing', run:() => closeSheet(true)}); return;
+  }
   sheet = null;
   if (was && was.type === 'ask' && was.back) sheet = was.back;
   if (was && was.type === 'group' && was.from === 'blocked' && missing(dateById(was.dateId)).length) sheet = {type:'blocked', dateId:was.dateId};
@@ -1691,10 +1776,12 @@ const ACT = {
   pall(ds) { const p = S.people[ds.person]; p.dates = p.dates === 'all' ? [] : 'all'; render(); renderSheet(); toast(p.dates === 'all' ? `${p.name} can now see every date on the tour` : `${p.name} can no longer see any dates`); return false; },
   plan(ds) { const p = S.people[ds.person]; p.canPlan = !p.canPlan; render(); renderSheet(); toast(`${p.name} can ${p.canPlan ? 'now' : 'no longer'} add and move tour dates`); return false; },
   'tour-edit'() { sheet = {type:'tourform', draft:{name:S.tour.name, artist:S.tour.artist}, err:{}}; sheet.orig = JSON.stringify(sheet.draft); renderSheet('df-name'); return false; },
-  discard() { closeSheet(true); return false; },
+  'dlg-cancel'() { closeDlg(); return false; },
+  'dlg-ok'() { const o = closeDlg(); if (o) o.run(); },
+  'toast-close'() { clearTimeout(toastT); $('toast').classList.remove('on'); return false; },
+  'field-ok'(ds, b) { const t = b.parentElement.querySelector('input'); if (t) { commit(t); t.blur(); } return false; },
   celebrate() { celebrate(); return false; },
   'cele-close'() { closeCele(); S.tab = 'tour'; S.route = null; },
-  'keep-editing'() { sheet.askDiscard = false; renderSheet(); return false; },
   'tf-save'() {
     const name = (sheet.draft.name || '').trim(), artist = (sheet.draft.artist || '').trim();
     if (!name) { sheet.err = {name:'Give the tour a name.'}; renderSheet('df-name'); return false; }
@@ -1706,8 +1793,12 @@ const ACT = {
   view(ds) { if (ds.for === 'tour') S.tourView = ds.view; else S.schedView = ds.view; },
   'date-edit'(ds) { openDateForm(dateById(ds.date)); renderSheet(); return false; },
   'df-kind'(ds) { sheet.draft.kind = ds.kind; sheet.err = {}; renderSheet(); return false; },
-  'df-remove'() { sheet.confirmRemove = true; renderSheet(); $('sheet').querySelector('.sh-body').scrollTop = 1e6; return false; },
-  'df-remove-cancel'() { sheet.confirmRemove = false; renderSheet(); return false; },
+  'df-remove'() {
+    const d = dateById(sheet.dateId), n = Object.values(d.v).filter(x => (x || '').trim()).length + (d.events || []).length;
+    askConfirm({title:`Remove ${dateLabel(d)}?`, ok:'Remove date',
+      body:`${placeLabel(d)} comes off the tour for everyone. ${n ? `The ${n} detail${n === 1 ? '' : 's'} entered for it will be deleted.` : 'Nothing has been entered for it yet.'} This can't be undone.`, run:() => ACT['df-remove-go']()});
+    return false;
+  },
   'df-remove-go'() {
     const d = dateById(sheet.dateId), what = `${dateLabel(d)} · ${placeLabel(d)}`;
     S.dates.splice(S.dates.indexOf(d), 1);
@@ -1750,11 +1841,18 @@ const ACT = {
     renderSheet(`ev-${ev.id}-name`); return false;
   },
   'ev-remove'(ds) {
-    const d = dateById(ds.date), i = d.events.findIndex(e => e.id === ds.ev), ev = d.events[i], was = d.confirmed, wasMissing = missing(d).length, real = !evEmpty(ev);
-    d.events.splice(i, 1);
-    S.changes.forEach(c => { if (c.open && c.kind === 'request' && c.dateId === d.id && String(c.field).indexOf(`ev-${ev.id}-`) === 0) { c.open = false; c.done = 'The event was removed'; } });
-    if (real) { logChange({dateId:d.id, group:'extras', kind:'removed', label:'Event', from:ev.name || 'Unnamed event'}); settle(d, was, wasMissing, ev.name || 'An event', null, true, 'was removed', 'extras'); }
-    render(); renderSheet(); return false;
+    const d = dateById(ds.date), ev = d.events.find(e => e.id === ds.ev); if (!ev) return false;
+    const go = () => {
+      const i = d.events.indexOf(ev), was = d.confirmed, wasMissing = missing(d).length, real = !evEmpty(ev);
+      d.events.splice(i, 1);
+      S.changes.forEach(c => { if (c.open && c.kind === 'request' && c.dateId === d.id && String(c.field).indexOf(`ev-${ev.id}-`) === 0) { c.open = false; c.done = 'The event was removed'; } });
+      if (real) { logChange({dateId:d.id, group:'extras', kind:'removed', label:'Event', from:ev.name || 'Unnamed event'}); settle(d, was, wasMissing, ev.name || 'An event', null, true, 'was removed', 'extras'); }
+      render(); renderSheet();
+    };
+    if (evEmpty(ev)) { go(); return false; }            // nothing typed, nothing to lose
+    askConfirm({title:`Remove ${ev.name || 'this event'}?`, ok:'Remove event',
+      body:`It comes off ${dateLabel(d)} for everyone on the tour.${d.confirmed && !isPast(d) ? ` ${placeLabel(d)} will need to be confirmed again.` : ''} This can't be undone.`, run:go});
+    return false;
   },
   'close-sheet'() { closeSheet(); return false; },
   confirm(ds) {
@@ -1832,10 +1930,15 @@ const ACT = {
   theme(ds) { S.theme = ds.themeVal; },
   'today-step'(ds) { S.today = addDays(S.today, +ds.step); },
   'time-step'(ds) { S.now = Math.max(0, Math.min(1439, S.now + (+ds.step))); },
-  reset() { closeCele(); S = seed(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Sample data restored'); },
+  reset() {
+    askConfirm({shell:true, icon:'undo', title:'Restart the prototype?', ok:'Restart', body:'The sample tour comes back and anything you entered is lost. The viewer, theme and clock reset too.',
+      run:() => { closeCele(); S = seed(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; $('rig').classList.remove('open'); toast('Restarted with the sample tour'); }});
+    return false;
+  },
   'clear-data'() {
-    if (!clearArmed) { clearArmed = true; clearTimeout(clearT); clearT = setTimeout(() => { clearArmed = false; render(); }, 4000); return; }
-    clearArmed = false; clearTimeout(clearT); closeCele(); S = clearedData(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Everything cleared. Name the tour and add its first date.');
+    askConfirm({shell:true, title:'Clear everything?', ok:'Clear everything', body:"Every date, detail, change and the stage plot is deleted, so you can build a tour from scratch. Who you are viewing as, the theme and the clock stay as they are. This can't be undone.",
+      run:() => { closeCele(); S = clearedData(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; $('rig').classList.remove('open'); toast('Everything cleared. Name the tour and add its first date.'); }});
+    return false;
   },
   'fill-data'() { S = filledData(); sheet = null; plotURL = null; renderSheet(); lastViewKey = ''; toast('Every date filled in and confirmed'); },
   'rig-open'() { $('rig').classList.add('open'); return false; },
@@ -1849,7 +1952,7 @@ function refocus(sig) {
   const a = document.activeElement;
   if (a && a !== document.body && document.body.contains(a) && a.offsetParent !== null) return;
   let el = null;
-  try { el = sig && (sheet ? $('sheet') : document).querySelector(sig); } catch (e) {}
+  try { el = sig && ((sheet ? $('sheet') : document).querySelector(sig) || $('rig').querySelector(sig)); } catch (e) {}
   if (!el || el.disabled) el = sheet ? $('sheet').querySelector('.sh-x') : $('view');
   if (el) el.focus({preventScroll:true});
 }
@@ -1859,11 +1962,31 @@ document.addEventListener('click', e => {
   /* A second click that lands where a just-removed thing was does not fall through to whatever is there now. */
   if (clickLock && Date.now() < clickLock.t && Math.abs(e.clientX - clickLock.x) < 80 && Math.abs(e.clientY - clickLock.y) < 80) return;
   lastXY = [e.clientX, e.clientY];
-  const sig = sigOf(b), had = !!sheet;
-  if (ACT[b.dataset.action](b.dataset) !== false) render();
+  const sig = sigOf(b), had = !!sheet, inDlg = !!b.closest('.dlg');
+  if (!inDlg) lastSig = sig;
+  focusNext = null;
+  if (ACT[b.dataset.action](b.dataset, b) !== false) render();
   if (!had && sheet) opener = sig;
-  refocus(had && !sheet ? opener : sig);
+  if (b.dataset.action === 'field-ok' || b.dataset.action === 'toast-close') return;   // focus stays where the person left it
+  refocus(had && !sheet ? opener : (focusNext || sig));
 });
+/* The check inside a field and the X on a toast must not pull focus (and the keyboard) away from what is being edited. */
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.okbtn,.toast-x')) e.preventDefault(); });
+/* Saving a field can hide the link that sat right after it ("Ask someone for this"). If Tab was heading there,
+   focus is handed to the next field instead of being dropped to the top of the page. */
+let tabAt = 0, tabBack = false;
+const focusables = box => [...box.querySelectorAll('button,input,select,textarea,a[href]')].filter(x => !x.disabled && x.offsetParent !== null && x.tabIndex !== -1);
+function keepFocus(t) {
+  if (Date.now() - tabAt > 500) return;                 // only when the keyboard moved the focus
+  const back = tabBack;
+  setTimeout(() => {
+    if (!sheet || dlg) return;
+    const box = $('sheet'), a = document.activeElement;
+    if (a && a !== document.body && box.contains(a) && a.offsetParent !== null) return;
+    const f = focusables(box), i = f.indexOf(t), nxt = i < 0 ? null : back ? f[i - 1] : f[i + 1];
+    (nxt || (i < 0 ? box.querySelector('.sh-x') : t)).focus();
+  }, 0);
+}
 function takePlot(t) {
   const file = t.files && t.files[0]; if (!file) return;
   const pdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name), img = /^image\/(png|jpeg)$/.test(file.type), dateId = sheet.dateId;
@@ -1886,24 +2009,30 @@ function onInput(e) {
   if (e.type !== 'change' || !sheet) return;
   if (t.id === 'plotFile') { takePlot(t); return; }
   if (t.type === 'time') return;                        // saved when focus leaves, so a half-typed time is never logged
-  commit(t);
+  commit(t); keepFocus(t);
 }
 document.addEventListener('change', onInput);
 document.addEventListener('input', e => { const t = e.target; if (t.id === 'nowIn' || t.id === 'todayIn' || (t.dataset && t.dataset.df)) onInput(e); });
-document.addEventListener('focusout', e => { const t = e.target; if (t && t.type === 'time' && t.dataset && (t.dataset.input || t.dataset.ev)) commit(t); });
+document.addEventListener('focusout', e => { const t = e.target; if (t && t.type === 'time' && t.dataset && (t.dataset.input || t.dataset.ev)) { commit(t); keepFocus(t); } });
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && dlg) { closeDlg(); refocus(focusNext); return; }
   if (e.key === 'Escape' && closeCele()) { refocus(null); return; }
   if (e.key === 'Escape') { if (sheet) { closeSheet(); refocus(sheet ? null : opener); } else $('rig').classList.remove('open'); }
   if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.dataset && (e.target.dataset.input || e.target.dataset.ev)) e.target.blur();
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.df && sheet) { e.preventDefault(); sheet.draft[e.target.dataset.df] = e.target.value; ACT[sheet.type === 'tourform' ? 'tf-save' : sheet.type === 'ask' ? 'ask-send' : 'df-save']({}); }
-  /* While a sheet is open, Tab stays inside it. */
-  if (e.key === 'Tab' && sheet) {
-    const box = $('sheet'), f = [...box.querySelectorAll('button,input,select,textarea,a[href]')].filter(x => !x.disabled && x.offsetParent !== null && x.tabIndex !== -1);
-    if (!f.length) return;
-    const first = f[0], last = f[f.length - 1], a = document.activeElement, inside = box.contains(a);
-    if (e.shiftKey && (a === first || !inside)) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && (a === last || !inside)) { e.preventDefault(); first.focus(); }
-  }
+  if (e.key !== 'Tab') return;
+  tabAt = Date.now(); tabBack = e.shiftKey;
+  /* Save a field before focus moves on, so whatever the save hides is gone before the browser picks the next stop. */
+  const t = e.target;
+  if (sheet && !dlg && t.tagName === 'INPUT' && t.type !== 'time' && t.dataset && (t.dataset.input || t.dataset.ev)) commit(t);
+  /* While a dialog or a sheet is open, Tab stays inside it. */
+  const box = dlg ? $(dlg.shell ? 'dlgShell' : 'dlg') : sheet ? $('sheet') : null;
+  if (!box) return;
+  const f = focusables(box);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1], a = document.activeElement, inside = box.contains(a);
+  if (e.shiftKey && (a === first || !inside)) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && (a === last || !inside)) { e.preventDefault(); first.focus(); }
 });
 
 S = load();
