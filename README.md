@@ -1,6 +1,7 @@
 # daysheet
 
-[https://autocosm.github.io/daysheet/daysheet-prototype.html](https://autocosm.github.io/daysheet/daysheet-prototype.html)
+- Test app: [https://autocosm.github.io/daysheet/daysheet-prototype.html](https://autocosm.github.io/daysheet/daysheet-prototype.html)
+- Design system: [https://autocosm.github.io/daysheet/design-system.html](https://autocosm.github.io/daysheet/design-system.html)
 
 ## Tester instructions
 
